@@ -166,49 +166,28 @@ int main(void)
     bsp_as5600Init();
     PID_init();
     
+    // ADC读取，可优化
 	HAL_ADC_Start(&hadc1);
     HAL_ADC_PollForConversion(&hadc1,10);    //等待转换完成，第二个参数表示超时时间，单位ms 
 	HAL_ADC_Start(&hadc2);
     HAL_ADC_PollForConversion(&hadc2,10);    //等待转换完成，第二个参数表示超时时间，单位ms
 
+    // 电角度对正，可优化
     for (int j = 0; j < 50; j++){
         setPhaseVoltage(6, 0, 0);
     }
-    
     HAL_TIM_Base_Start_IT(&htim2);
     HAL_TIM_Base_Start_IT(&htim3);
     HAL_TIM_Base_Start_IT(&htim4);
 
-//    HAL_Delay(5000);
   /* USER CODE END 2 */
 
   /* Infinite loop */
   /* USER CODE BEGIN WHILE */
   while (1)
-  {
-//      printf("hello, world!");
-//      HAL_GPIO_WritePin(GPIOA, GPIO_PIN_4, GPIO_PIN_SET);
-//      angle_el = bsp_as5600GetAngle();
-//      HAL_Delay(100);
-//      HAL_GPIO_WritePin(GPIOA, GPIO_PIN_4, GPIO_PIN_RESET);
-//      angle = angle_el * POLEPAIRS;
-//      setPhaseVoltage(6, 0, angle);
-      
-      
-//      HAL_GPIO_WritePin(GPIOC, GPIO_PIN_13, GPIO_PIN_SET);
-//      HAL_Delay(100);
-//      HAL_GPIO_WritePin(GPIOC, GPIO_PIN_13, GPIO_PIN_RESET);
-//      HAL_Delay(100);
-      
-      
-//      printf("%f,%f,%f,%f,%f,%f,%d,%d\n", angle, vel, vel_sp, Current.q, currentQ_sp, Current.d, AD_Value_0, AD_Value_1);
+  {      
       printf("%f,%f,%f,%f,%f,%f,%f,%f,%d,%d\n", angle, ang_sp, vel, vel_sp, Current.q, currentQ_sp, Current.d, currentD_sp, \
-        AD_Value_0, AD_Value_1);
-      
-//      printf("%f,%f\n", Current.q, Current.d);
-//      printf("%f,%f,%f,%f\n", currentQ_sp, Current.q, Current.d, vel);
-//      printf("%f,%f,%f,%f,%f\n", Current.q, Current.d, PhaCurrent.a, PhaCurrent.b, vel);
-//      printf("%d,%d,%f\n",AD_Value_0, AD_Value_1, vel);
+      AD_Value_0, AD_Value_1);
       HAL_Delay(10);
     /* USER CODE END WHILE */
 

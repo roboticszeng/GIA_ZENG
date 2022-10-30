@@ -43,6 +43,8 @@ PhaseCurrent_s PhaCurrent;
 #define AD1_OFFSET 116
 #define AD2_OFFSET 123
 
+//通讯中断的代码还没写
+
 
 /* USER CODE END PD */
 
@@ -56,7 +58,6 @@ PhaseCurrent_s PhaCurrent;
 float angle;
 float angle_el = 0.0;
 float angle_prev;
-//extern float Ts;
 float vel;
 
 float y_current_q_prev;
@@ -242,6 +243,8 @@ void TIM2_IRQHandler(void)
   HAL_TIM_IRQHandler(&htim2);
   /* USER CODE BEGIN TIM2_IRQn 1 */
     
+    // 编码器读取速率太低，导致电流读取也跟着很低，待改进
+    
     
     angle = bsp_as5600GetAngle();
     angle_el = angle * POLEPAIRS;
@@ -287,6 +290,7 @@ void TIM3_IRQHandler(void)
   /* USER CODE BEGIN TIM3_IRQn 1 */
     
     //期望频率500Hz
+    // 有待提高
 
     setPhaseVoltage(PID_current_Q(currentQ_sp - Current.q), -PID_current_D(currentD_sp - Current.d), angle_el);
 
@@ -305,6 +309,7 @@ void TIM4_IRQHandler(void)
   /* USER CODE BEGIN TIM4_IRQn 1 */
     
     // 频率250Hz
+    // 位置速度环都写在一起了
     
     ang_sp = 3.14 / 3 * _sin(t * 6.28) + 5;
     t = t + 0.004;

@@ -1,5 +1,7 @@
 #include "bsp_as5600.h"
 
+// as5600目前最大的问题：读取速率太慢了，500us
+
 #define abs(x) ((x)>0?(x):-(x))
 #define _2PI 6.28318530718
 

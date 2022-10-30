@@ -2,6 +2,7 @@
 #include <math.h>
 #include "FOC_kernal_3.h"
 
+// 中心对齐PWM会不会改善效果？
 #define PWM_Period 1200
 /******************************************************************************/
 float voltage_power_supply = 24;              //24V
