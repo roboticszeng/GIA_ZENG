@@ -63,8 +63,8 @@ int fputc(int ch, FILE *f) {
 //#define _2_SQRT3 1.15470053838f
 //#define _2PI 6.28318530718f
 
-#define RCS 0.01														//采样电阻阻值
-#define GAIN 20	
+//#define RCS 0.01														//采样电阻阻值
+//#define GAIN 20	
 
 /* USER CODE END PD */
 
