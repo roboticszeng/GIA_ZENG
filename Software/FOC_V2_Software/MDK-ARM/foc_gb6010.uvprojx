@@ -432,6 +432,11 @@
               <FilePath>..\Core\Src\simple_math.c</FilePath>
             </File>
             <File>
+              <FileName>AS5600.c</FileName>
+              <FileType>1</FileType>
+              <FilePath>..\Core\Src\AS5600.c</FilePath>
+            </File>
+            <File>
               <FileName>main.c</FileName>
               <FileType>1</FileType>
               <FilePath>../Core/Src/main.c</FilePath>

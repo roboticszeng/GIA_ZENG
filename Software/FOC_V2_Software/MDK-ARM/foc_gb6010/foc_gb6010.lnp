@@ -2,6 +2,7 @@
 "foc_gb6010\startup_stm32f103xb.o"
 "foc_gb6010\foc_kernal.o"
 "foc_gb6010\simple_math.o"
+"foc_gb6010\as5600.o"
 "foc_gb6010\main.o"
 "foc_gb6010\gpio.o"
 "foc_gb6010\adc.o"
