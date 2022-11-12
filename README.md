@@ -62,59 +62,70 @@ L6234D，功率偏大，下一版可以考虑换DRV8313？
 
 
 
+- 电机GB6010信息（厂商提供，待测）
+
+[淘宝链接](https://item.taobao.com/item.htm?spm=a1z09.2.0.0.7d002e8dyVimGY&id=639378697535&_u=c239sn30f500)
+
+![电机参数](Pics/电机参数.jpg)
+
+主要的问题：
+
+- 如何测定额定电流和额定扭矩？
+- 转速常数12rpm/V,也即24V时转速应为30rad/s，但实际上似乎没这么大？
+- 扭矩常数0.6，额定力矩和额定电流对不上
+- 
+
+![电机尺寸](Pics/电机尺寸.jpg)
+
 ## 3.软件设计
 
 + STM32CUBEMX引脚总览：
 
-| 引脚 | 名称      | 备注                              |
-| ---- | --------- | --------------------------------- |
-| PA0  | ADC1_IN0  |                                   |
-| PA1  | ADC2_IN1  | 下一版本改进：一个ADC多个通道采样 |
-| PA2  | USART2_TX |                                   |
-| PA3  | USART2_RX |                                   |
-| PA4  | OUT       | 测试用                            |
-| PA8  | TIM1_CH1  | PWM-U相输出                       |
-| PA9  | TIM1_CH2  | PWM-V相输出                       |
-| PA10 | TIM1_CH3  | PWM-W相输出                       |
-| PA11 | CAN_RX    | 待完成                            |
-| PA12 | CAN_TX    | 待完成                            |
-| PB6  | I2C1_SCL  |                                   |
-| PB7  | I2C1_SDA  |                                   |
-| PC13 | LED       |                                   |
+| 引脚 | 名称      | 备注                           |
+| ---- | --------- | ------------------------------ |
+| PA0  | ADC1_IN0  |                                |
+| PA1  | ADC1_IN1  |                                |
+| PA2  | USART2_TX |                                |
+| PA3  | USART2_RX |                                |
+| PA4  | SEN_DIR   | 编码器方向定义                 |
+| PA5  | KEY       | ==按键输入，软件暂未实现==     |
+| PA8  | TIM1_CH1  | PWM-U相输出                    |
+| PA9  | TIM1_CH2  | PWM-V相输出                    |
+| PA10 | TIM1_CH3  | PWM-W相输出                    |
+| PA11 | CAN_RX    |                                |
+| PA12 | CAN_TX    |                                |
+| PB5  | SENS_OUT  | 编码器电压输出（当前版本不用） |
+| PB6  | I2C1_SCL  | 编码器I2C通信                  |
+| PB7  | I2C1_SDA  | 编码器I2C通信                  |
+| PC13 | LED       |                                |
 
-+ STM32CUBEMX-Clock总览（暂时还没有配置CAN相关内容）：
++ STM32CUBEMX-Clock总览：
 
 ![cube_arc](Pics/cube_arc.png)
 
-+ NVIC：(更新CAN通讯之后可能有变化)
++ NVIC：==待更新==
 
 ![cube_nvic](Pics/cube_nvic.png)
 
 + 定时器：
 
-![cube_tim1](Pics/cube_tim1.png)
+公式：
+$$
+T=(ARR+1)*(PSC+1)/f_{ck}
+$$
 
+$$
+f=\frac{1}{T}
+$$
 
+$f_{ck}$单位为Hz，对于STM32F103C8T6，$f_{ck}=72\times10^6$Hz；$T$单位为s。
 
-![cube_tim2](Pics/cube_tim2.png)
-
-
-
-![cube_tim3](Pics/cube_tim3.png)
-
-
-
-![cube_tim4](Pics/cube_tim4.png)
-
-
-
-+ RCC
-
-![cube_rcc](Pics/cube_rcc.png)
-
-+ Clock Configuration
-
-![/cube_clock](Pics/cube_clock.png)
+| 定时器 | 分频值 | 重装值 | 周期   | 频率     | 功能简介           |
+| ------ | ------ | ------ | ------ | -------- | ------------------ |
+| TIM1   | 3-1    | 1500-1 | 62.5us | 16kHz    | 生成PWM波&电流采样 |
+| TIM2   | 300-1  | 240-1  | 1ms    | 1000Hz   | 编码器采样         |
+| TIM3   | 160-1  | 72-1   | 160us  | 6.25kHz  | 电流环控制         |
+| TIM4   | 160-1  | 144-1  | 320us  | 3.125kHz | 位置环&速度环控制  |
 
 
 

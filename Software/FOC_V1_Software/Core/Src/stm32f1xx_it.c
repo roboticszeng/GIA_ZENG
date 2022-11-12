@@ -292,7 +292,8 @@ void TIM3_IRQHandler(void)
     //期望频率500Hz
     // 有待提高
 
-    setPhaseVoltage(PID_current_Q(currentQ_sp - Current.q), -PID_current_D(currentD_sp - Current.d), angle_el);
+    // setPhaseVoltage(PID_current_Q(currentQ_sp - Current.q), -PID_current_D(currentD_sp - Current.d), angle_el);
+    setPhaseVoltage(currentQ_sp, currentD_sp, angle_el);
 
   /* USER CODE END TIM3_IRQn 1 */
 }
