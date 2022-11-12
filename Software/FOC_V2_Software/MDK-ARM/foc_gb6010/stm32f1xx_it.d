@@ -37,3 +37,7 @@ foc_gb6010\stm32f1xx_it.o: ../Core/Inc/as5600.h
 foc_gb6010\stm32f1xx_it.o: ../Core/Inc/i2c.h
 foc_gb6010\stm32f1xx_it.o: ../Core/Inc/foc_kernal.h
 foc_gb6010\stm32f1xx_it.o: ../Core/Inc/simple_math.h
+foc_gb6010\stm32f1xx_it.o: ../Core/Inc/PID.h
+foc_gb6010\stm32f1xx_it.o: ..\IQMath-master\IQmathLib.h
+foc_gb6010\stm32f1xx_it.o: d:\Keil_v5\ARM\ARMCC\Bin\..\include\limits.h
+foc_gb6010\stm32f1xx_it.o: d:\Keil_v5\ARM\ARMCC\Bin\..\include\stdlib.h

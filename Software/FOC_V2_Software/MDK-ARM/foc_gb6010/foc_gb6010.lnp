@@ -11,6 +11,7 @@
 "foc_gb6010\usart.o"
 "foc_gb6010\stm32f1xx_it.o"
 "foc_gb6010\stm32f1xx_hal_msp.o"
+"..\IQMath-master\rvmdk-cm3\IQmathLib-cm3.lib"
 "foc_gb6010\stm32f1xx_hal_gpio_ex.o"
 "foc_gb6010\stm32f1xx_hal_adc.o"
 "foc_gb6010\stm32f1xx_hal_adc_ex.o"

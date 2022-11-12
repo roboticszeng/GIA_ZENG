@@ -45,6 +45,10 @@ float _sin(float a);
 float _cos(float a);
 float _sqrtApprox(float number);
 
+int _sin_int(int a);
+int _cos_int(int a);
+
+
 /* USER CODE END Prototypes */
 
 #ifdef __cplusplus

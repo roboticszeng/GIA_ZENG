@@ -28,7 +28,8 @@
 #include "i2c.h"
 #include "foc_kernal.h"
 #include "simple_math.h"
-
+#include "PID.h"
+#include "IQmathLib.h"
 
 /* USER CODE END Includes */
 
@@ -69,6 +70,12 @@ uint16_t limitedVel;
 uint16_t limitedCurQ;
 
 extern float angle_elec;
+extern PIDController PID_Current_Q;
+
+
+int angle_elec_int;
+int K1 = 19;
+int K2 = -66000;
 /* USER CODE END PV */
 
 /* Private function prototypes -----------------------------------------------*/
@@ -231,8 +238,6 @@ void SysTick_Handler(void)
 /**
   * @brief This function handles TIM1 update interrupt.
   */
-float tempa;
-float tempb;
 void TIM1_UP_IRQHandler(void)
 {
   /* USER CODE BEGIN TIM1_UP_IRQn 0 */
@@ -245,6 +250,14 @@ void TIM1_UP_IRQHandler(void)
 //    HAL_GPIO_WritePin(GPIOC, GPIO_PIN_13, GPIO_PIN_SET);
     // 电流采样 实测时间42.5us
     ADC_get_voltage();
+    
+//    Id = K1 * (_sin(angle_elec + _PI_3) * actualCurA + _sin(angle_elec) * actualCurB) + K2 * _sin(angle_elec + _PI_6);
+//    Iq = K1 * (_cos(angle_elec + _PI_3) * actualCurA + _cos(angle_elec) * actualCurB) + K2 * _cos(angle_elec + _PI_6);
+    
+//    I_alpha = actualCurA;
+//    I_beta = _1_SQRT3 * actualCurA + _2_SQRT3 * actualCurB;
+//    Current.d= I_alpha *_cos(angle_elec) + I_beta *_sin(angle_elec);
+//    Current.q= I_beta *_cos(angle_elec) - I_alpha *_sin(angle_elec);
     
 //    tempa = ((3.3*((float)actualCurA/4096))-1.65)/0.01/50;      //相电流物理值=（采样电压-偏置）/Rcs/增益  ;  单位：A
 //    tempb =((3.3*((float)actualCurB/4096))-1.65)/0.01/50;
@@ -266,11 +279,11 @@ void TIM2_IRQHandler(void)
   HAL_TIM_IRQHandler(&htim2);
   /* USER CODE BEGIN TIM2_IRQn 1 */
     
-    HAL_GPIO_WritePin(GPIOC, GPIO_PIN_13, GPIO_PIN_SET);
+//    HAL_GPIO_WritePin(GPIOC, GPIO_PIN_13, GPIO_PIN_SET);
     // 获取角度原始信息
     AS5600_get_rawAngle(encoder, &actualPos);
     get_angle_elec();
-    HAL_GPIO_WritePin(GPIOC, GPIO_PIN_13, GPIO_PIN_RESET);
+//    HAL_GPIO_WritePin(GPIOC, GPIO_PIN_13, GPIO_PIN_RESET);
   /* USER CODE END TIM2_IRQn 1 */
 }
 
@@ -280,26 +293,19 @@ void TIM2_IRQHandler(void)
 void TIM3_IRQHandler(void)
 {
   /* USER CODE BEGIN TIM3_IRQn 0 */
-    static float a;
+//    static float a, b;
+//    int Id, Iq;
   /* USER CODE END TIM3_IRQn 0 */
   HAL_TIM_IRQHandler(&htim3);
   /* USER CODE BEGIN TIM3_IRQn 1 */
-//    HAL_GPIO_WritePin(GPIOC, GPIO_PIN_13, GPIO_PIN_SET);
-//    
-    
-    //a = actualPos * _2PI / CONST_ENC_RESOLUTION * CONST_POLAR_PAIRS;
-    
+    HAL_GPIO_WritePin(GPIOC, GPIO_PIN_13, GPIO_PIN_SET);
     
     setPhaseVoltage(0.5, 0);
     
+    HAL_GPIO_WritePin(GPIOC, GPIO_PIN_13, GPIO_PIN_RESET);
     
-    
-//    setPhaseVoltage(1, 0, actualPos);
-//    setPhaseVoltage(0.1, 0, a);
-    
-//    a = a + 0.001;
 //    
-//    HAL_GPIO_WritePin(GPIOC, GPIO_PIN_13, GPIO_PIN_RESET);
+
   /* USER CODE END TIM3_IRQn 1 */
 }
 

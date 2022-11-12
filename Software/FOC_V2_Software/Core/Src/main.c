@@ -44,6 +44,7 @@ int fputc(int ch, FILE *f) {
 #include "foc_kernal.h"
 #include "as5600.h"
 #include "simple_math.h"
+#include "PID.h"
 
 /* USER CODE END Includes */
 
@@ -87,6 +88,31 @@ void SystemClock_Config(void);
 
 /* Private user code ---------------------------------------------------------*/
 /* USER CODE BEGIN 0 */
+/* Controller parameters */
+#define PID_KP  2.0f
+#define PID_KI  0.5f
+#define PID_KD  0.25f
+
+#define PID_TAU 0.02f
+
+#define PID_LIM_MIN -10.0f
+#define PID_LIM_MAX  10.0f
+
+#define PID_LIM_MIN_INT -5.0f
+#define PID_LIM_MAX_INT  5.0f
+
+#define SAMPLE_TIME_S 0.01f
+
+/* Maximum run-time of simulation */
+#define SIMULATION_TIME_MAX 4.0f
+
+
+PIDController PID_Current_Q = { 1.0, 0.0, 0.0,
+                      0.0,
+                      -1, 1,
+          -0.5, 0.5,
+                      500e-6 };
+
 
 /* USER CODE END 0 */
 
@@ -103,6 +129,13 @@ int main(void)
     encoder->i2c_handle = &hi2c1;
     // sensor->dir_port = dir_GPIO_Port;
     // sensor->dir_pin = dir_Pin;
+    
+
+
+    //PIDController_Init(&PID_Current_Q);
+    
+    
+    
   /* USER CODE END 1 */
 
   /* MCU Configuration--------------------------------------------------------*/
@@ -182,10 +215,10 @@ int main(void)
       
       
       //printf("%d, %d, %d\r\n", actualCurA, actualCurB, actualPos);
-      tempa = ((3.3*((float)actualCurA/4096))-1.65)/0.01/50;      //相电流物理值=（采样电压-偏置）/Rcs/增益  ;  单位：A
-      tempb =((3.3*((float)actualCurB/4096))-1.65)/0.01/50;
-      printf("%f,%f\r\n", tempa, tempb);
-      HAL_Delay(10);
+//      tempa = ((3.3*((float)actualCurA/4096))-1.65)/0.01/50;      //相电流物理值=（采样电压-偏置）/Rcs/增益  ;  单位：A
+//      tempb =((3.3*((float)actualCurB/4096))-1.65)/0.01/50;
+//      printf("%f,%f\r\n", tempa, tempb);
+//      HAL_Delay(10);
     /* USER CODE END WHILE */
 
     /* USER CODE BEGIN 3 */

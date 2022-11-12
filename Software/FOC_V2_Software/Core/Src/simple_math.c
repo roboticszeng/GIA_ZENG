@@ -31,6 +31,34 @@ float _cos(float a){
   a_sin = a_sin > _2PI ? a_sin - _2PI : a_sin;
   return _sin(a_sin);
 }
+
+int _sin_int(int a){
+  if(a < 157){
+    //return sine_array[(int)(199.0*( a / (_PI/2.0)))];
+    //return sine_array[(int)(126.6873* a)];           // float array optimized
+    return SINE_ARRAY[_round(1.266873* a)];      // int array optimized
+  }else if(a < 314){
+    // return sine_array[(int)(199.0*(1.0 - (a-_PI/2.0) / (_PI/2.0)))];
+    //return sine_array[398 - (int)(126.6873*a)];          // float array optimized
+    return SINE_ARRAY[398 - _round(1.266873*a)];     // int array optimized
+  }else if(a < 471){
+    // return -sine_array[(int)(199.0*((a - _PI) / (_PI/2.0)))];
+    //return -sine_array[-398 + (int)(126.6873*a)];           // float array optimized
+    return -SINE_ARRAY[-398 + _round(1.266873*a)];      // int array optimized
+  } else {
+    // return -sine_array[(int)(199.0*(1.0 - (a - 3*_PI/2) / (_PI/2.0)))];
+    //return -sine_array[796 - (int)(126.6873*a)];           // float array optimized
+    return -SINE_ARRAY[796 - _round(1.266873*a)];      // int array optimized
+  }
+}
+/***************************************************************************/
+// function approximating cosine calculation by using fixed size array
+int _cos_int(int a){
+  int a_sin = a + 157;
+  a_sin = a_sin > 314 ? a_sin - 314 : a_sin;
+  return _sin(a_sin);
+}
+
 /***************************************************************************/
 //近似开根号函数
 float _sqrtApprox(float number) {//low in fat
