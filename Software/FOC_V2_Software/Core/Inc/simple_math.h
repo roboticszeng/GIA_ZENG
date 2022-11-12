@@ -12,6 +12,8 @@ extern "C" {
 
 /* USER CODE BEGIN Includes */
 
+#include "IQmathLib.h"
+    
 /* USER CODE END Includes */
 
 /* USER CODE BEGIN Private defines */

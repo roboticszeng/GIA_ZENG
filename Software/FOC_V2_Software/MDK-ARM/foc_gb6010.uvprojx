@@ -365,7 +365,7 @@
               <MiscControls>--c99</MiscControls>
               <Define>USE_HAL_DRIVER,STM32F103xB</Define>
               <Undefine></Undefine>
-              <IncludePath>../Core/Inc;../Drivers/STM32F1xx_HAL_Driver/Inc;../Drivers/STM32F1xx_HAL_Driver/Inc/Legacy;../Drivers/CMSIS/Device/ST/STM32F1xx/Include;../Drivers/CMSIS/Include;..\IQMath-master</IncludePath>
+              <IncludePath>../Core/Inc;../Drivers/STM32F1xx_HAL_Driver/Inc;../Drivers/STM32F1xx_HAL_Driver/Inc/Legacy;../Drivers/CMSIS/Device/ST/STM32F1xx/Include;../Drivers/CMSIS/Include;../IQMath-master</IncludePath>
             </VariousControls>
           </Cads>
           <Aads>
@@ -435,6 +435,16 @@
               <FileName>AS5600.c</FileName>
               <FileType>1</FileType>
               <FilePath>..\Core\Src\AS5600.c</FilePath>
+            </File>
+            <File>
+              <FileName>IQmathLib.h</FileName>
+              <FileType>5</FileType>
+              <FilePath>..\IQMath-master\IQmathLib.h</FilePath>
+            </File>
+            <File>
+              <FileName>IQmathLib-cm3.lib</FileName>
+              <FileType>4</FileType>
+              <FilePath>..\IQMath-master\rvmdk-cm3\IQmathLib-cm3.lib</FilePath>
             </File>
             <File>
               <FileName>main.c</FileName>
@@ -561,16 +571,6 @@
               <FileName>stm32f1xx_hal_msp.c</FileName>
               <FileType>1</FileType>
               <FilePath>../Core/Src/stm32f1xx_hal_msp.c</FilePath>
-            </File>
-            <File>
-              <FileName>IQmathLib.h</FileName>
-              <FileType>5</FileType>
-              <FilePath>..\IQMath-master\IQmathLib.h</FilePath>
-            </File>
-            <File>
-              <FileName>IQmathLib-cm3.lib</FileName>
-              <FileType>4</FileType>
-              <FilePath>..\IQMath-master\rvmdk-cm3\IQmathLib-cm3.lib</FilePath>
             </File>
           </Files>
         </Group>

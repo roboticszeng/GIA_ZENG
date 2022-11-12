@@ -77,6 +77,11 @@ AS5600_TypeDef* encoder;
 
 extern float angle_elec;
 
+extern int Pa, Pb, Pc;
+extern float Pf[8];
+extern int Pa_old, Pb_old, Pc_old;
+extern float Pf_old[8];
+
 
 /* USER CODE END PV */
 
@@ -166,13 +171,12 @@ int main(void)
   /* USER CODE BEGIN 2 */
     HAL_GPIO_WritePin(GPIOC, GPIO_PIN_13, GPIO_PIN_RESET);
     AS5600_init(encoder);
-    angle_elec = 0.0;
     
     for(int i = 0; i < 500; i++){
-        setPhaseVoltage(0.5, 0.0);
+        setPhaseVoltage(0.5, 0.0, 0.0);
+        HAL_Delay(1);
     }
     
-    HAL_Delay(1000);
     
     HAL_TIM_Base_Start_IT(&htim1);
     HAL_TIM_Base_Start_IT(&htim2);
@@ -214,11 +218,18 @@ int main(void)
 //      HAL_GPIO_WritePin(GPIOC, GPIO_PIN_13, GPIO_PIN_SET);
       
       
-      //printf("%d, %d, %d\r\n", actualCurA, actualCurB, actualPos);
+      printf("%d, %d, %d\r\n", actualCurA, actualCurB, actualPos);
 //      tempa = ((3.3*((float)actualCurA/4096))-1.65)/0.01/50;      //相电流物理值=（采样电压-偏置）/Rcs/增益  ;  单位：A
 //      tempb =((3.3*((float)actualCurB/4096))-1.65)/0.01/50;
 //      printf("%f,%f\r\n", tempa, tempb);
-//      HAL_Delay(10);
+//        printf("%d, %d, %d  %f, %f, %f, %f, %f  %d\r\n", Pa, Pb, Pc, Pf1, Pf2, Pf3, Pf4, Pf5, actualPos);
+////        printf("%f, %f, %d\r\n", Pf1, Pf2, actualPos);
+//      printf("%d, %d, %d, %d, %d, %d\r\n", Pa, Pb, Pc, Pa_old, Pb_old, Pc_old);
+//      for(int i = 0; i < 4; i++){
+//          printf("%.4f, %.4f,     ", Pf[i], Pf_old[i]);
+//      }
+//      printf("\r\n");
+      HAL_Delay(100);
     /* USER CODE END WHILE */
 
     /* USER CODE BEGIN 3 */

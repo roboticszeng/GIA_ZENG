@@ -76,6 +76,7 @@ extern PIDController PID_Current_Q;
 int angle_elec_int;
 int K1 = 19;
 int K2 = -66000;
+float tempa, tempb;
 /* USER CODE END PV */
 
 /* Private function prototypes -----------------------------------------------*/
@@ -242,28 +243,33 @@ void TIM1_UP_IRQHandler(void)
 {
   /* USER CODE BEGIN TIM1_UP_IRQn 0 */
 
+    static _iq I_alpha, I_beta, I_d, I_q;
+    
   /* USER CODE END TIM1_UP_IRQn 0 */
   HAL_TIM_IRQHandler(&htim1);
   /* USER CODE BEGIN TIM1_UP_IRQn 1 */
     
     
-//    HAL_GPIO_WritePin(GPIOC, GPIO_PIN_13, GPIO_PIN_SET);
+    HAL_GPIO_WritePin(GPIOC, GPIO_PIN_13, GPIO_PIN_SET);
     // 电流采样 实测时间42.5us
     ADC_get_voltage();
     
 //    Id = K1 * (_sin(angle_elec + _PI_3) * actualCurA + _sin(angle_elec) * actualCurB) + K2 * _sin(angle_elec + _PI_6);
 //    Iq = K1 * (_cos(angle_elec + _PI_3) * actualCurA + _cos(angle_elec) * actualCurB) + K2 * _cos(angle_elec + _PI_6);
     
-//    I_alpha = actualCurA;
-//    I_beta = _1_SQRT3 * actualCurA + _2_SQRT3 * actualCurB;
-//    Current.d= I_alpha *_cos(angle_elec) + I_beta *_sin(angle_elec);
-//    Current.q= I_beta *_cos(angle_elec) - I_alpha *_sin(angle_elec);
+    I_alpha = _IQ(actualCurA);
+    I_beta = _IQmpy(_IQ(_1_SQRT3), _IQ(actualCurA)) + _IQmpy(_IQ(_2_SQRT3), _IQ(actualCurB));
+    I_d = _IQmpy(I_alpha, _IQcos(_IQ(angle_elec))) + _IQmpy(I_beta, _IQsin(_IQ(angle_elec)));
+    I_q = _IQmpy(I_beta, _IQcos(_IQ(angle_elec))) - _IQmpy(I_alpha, _IQsin(_IQ(angle_elec)));
+    
+    tempa = _IQtoF(I_d);
+    tempb = _IQtoF(I_q);
     
 //    tempa = ((3.3*((float)actualCurA/4096))-1.65)/0.01/50;      //相电流物理值=（采样电压-偏置）/Rcs/增益  ;  单位：A
 //    tempb =((3.3*((float)actualCurB/4096))-1.65)/0.01/50;
     
     
-//    HAL_GPIO_WritePin(GPIOC, GPIO_PIN_13, GPIO_PIN_RESET);
+    HAL_GPIO_WritePin(GPIOC, GPIO_PIN_13, GPIO_PIN_RESET);
 
   /* USER CODE END TIM1_UP_IRQn 1 */
 }
@@ -282,6 +288,7 @@ void TIM2_IRQHandler(void)
 //    HAL_GPIO_WritePin(GPIOC, GPIO_PIN_13, GPIO_PIN_SET);
     // 获取角度原始信息
     AS5600_get_rawAngle(encoder, &actualPos);
+    
     get_angle_elec();
 //    HAL_GPIO_WritePin(GPIOC, GPIO_PIN_13, GPIO_PIN_RESET);
   /* USER CODE END TIM2_IRQn 1 */
@@ -293,16 +300,18 @@ void TIM2_IRQHandler(void)
 void TIM3_IRQHandler(void)
 {
   /* USER CODE BEGIN TIM3_IRQn 0 */
+    static float a;
 //    static float a, b;
 //    int Id, Iq;
   /* USER CODE END TIM3_IRQn 0 */
   HAL_TIM_IRQHandler(&htim3);
   /* USER CODE BEGIN TIM3_IRQn 1 */
-    HAL_GPIO_WritePin(GPIOC, GPIO_PIN_13, GPIO_PIN_SET);
+//    HAL_GPIO_WritePin(GPIOC, GPIO_PIN_13, GPIO_PIN_SET);
     
-    setPhaseVoltage(0.5, 0);
+    setPhaseVoltage(0.2, 0, a);
     
-    HAL_GPIO_WritePin(GPIOC, GPIO_PIN_13, GPIO_PIN_RESET);
+//    a += 0.002;
+//    HAL_GPIO_WritePin(GPIOC, GPIO_PIN_13, GPIO_PIN_RESET);
     
 //    
 
