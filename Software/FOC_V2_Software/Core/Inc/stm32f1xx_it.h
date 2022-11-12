@@ -28,6 +28,8 @@
 /* Private includes ----------------------------------------------------------*/
 /* USER CODE BEGIN Includes */
 
+#include <main.h>
+     
 /* USER CODE END Includes */
 
 /* Exported types ------------------------------------------------------------*/
@@ -38,6 +40,28 @@
 /* Exported constants --------------------------------------------------------*/
 /* USER CODE BEGIN EC */
 
+uint16_t CONST_JOINT_NUMBER = 0xd3;
+uint16_t CONST_POLAR_PAIRS = 14;
+uint16_t CONST_SUPPLY_VOLTAGE = 24;
+uint16_t CONST_ENC_RESOLUTION = 4096;
+uint16_t CONST_ENC_OFFSET = 0;
+uint16_t CONST_ELEC_ANG_OFFSET = 0;
+uint16_t CONST_ADC_RESOLUTION = 4096;
+uint16_t CONST_ADC_OFFSET_0 = 0;
+uint16_t CONST_ADC_OFFSET_1 = 0;
+uint16_t CONST_DIRECT_CUR_POS = 1;
+uint16_t CONST_SAMPLE_RESISTANCE = 10;
+uint16_t CONST_SAMPLE_GAIN = 50;
+uint16_t CONST_MCU_VOLTAGE = 3300;
+uint16_t CONST_POS_HIGHER_BOUND = 4096;
+uint16_t CONST_POS_LOWER_BOUND = 0;
+uint16_t CONST_VEL_HIGHER_BOUND = 40960;
+uint16_t CONST_VEL_LOWER_BOUND = 0;
+uint16_t CONST_CUR_Q_HIGHER_BOUND = 4096;
+uint16_t CONST_CUR_Q_LOWER_BOUND = 0;
+uint16_t CONST_CUR_D_HIGHER_BOUND = 4096;
+uint16_t CONST_CUR_D_LOWER_BOUND = 0;
+     
 /* USER CODE END EC */
 
 /* Exported macro ------------------------------------------------------------*/
@@ -55,7 +79,14 @@ void SVC_Handler(void);
 void DebugMon_Handler(void);
 void PendSV_Handler(void);
 void SysTick_Handler(void);
+void TIM1_UP_IRQHandler(void);
+void TIM2_IRQHandler(void);
+void TIM3_IRQHandler(void);
+void TIM4_IRQHandler(void);
 /* USER CODE BEGIN EFP */
+
+//void ADC_Select_Channel(uint32_t ch);
+//void ADC_get_voltage(void);
 
 /* USER CODE END EFP */
 

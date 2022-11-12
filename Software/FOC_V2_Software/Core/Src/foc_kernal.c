@@ -4,8 +4,12 @@
 #include <simple_math.h>
 
 extern int PWM_PERIOD;
-// 中心对齐PWM会不会改善效果？
-// 标准化角度 [0,2PI]
+extern uint16_t CONST_POLAR_PAIRS;
+extern uint16_t CONST_ENC_RESOLUTION;
+extern uint16_t actualPos;
+
+float angle_elec = 0.0;
+
 float _normalizeAngle(float angle)
 {
   float a = fmod(angle, _2PI);                     //fmod()对浮点数取模
@@ -13,11 +17,18 @@ float _normalizeAngle(float angle)
 }
 
 
+
+void get_angle_elec(void){
+    angle_elec = actualPos * CONST_POLAR_PAIRS * _2PI / CONST_ENC_RESOLUTION;
+    angle_elec = _normalizeAngle(angle_elec); // 电角度标准化在[0, _2PI]
+}
+
+
 /***************************************************************************/
 
 /******************************************************************************/
 //FOC核心函数：输入Ud、Uq和电角度，输出PWM
-void setPhaseVoltage(float Uq, float Ud, float angle_elec)
+void setPhaseVoltage(float Uq, float Ud)
 {
 	float Uref;
 	uint32_t sector;
@@ -25,7 +36,7 @@ void setPhaseVoltage(float Uq, float Ud, float angle_elec)
 	float Ta,Tb,Tc;
 	float U_alpha,U_beta;
 	
-	angle_elec =_normalizeAngle(angle_elec);                    //电角度标准化在【0,2pi】
+	                    
 
 	U_alpha = Ud * _cos(angle_elec) - Uq * _sin(angle_elec);            //反park变换
 	U_beta = Ud * _sin(angle_elec) + Uq * _cos(angle_elec);

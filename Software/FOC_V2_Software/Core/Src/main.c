@@ -43,6 +43,7 @@ int fputc(int ch, FILE *f) {
 
 #include "foc_kernal.h"
 #include "as5600.h"
+#include "simple_math.h"
 
 /* USER CODE END Includes */
 
@@ -64,9 +65,16 @@ int fputc(int ch, FILE *f) {
 
 /* USER CODE BEGIN PV */
 
+extern uint16_t actualCurA;
+extern uint16_t actualCurB;
+extern uint16_t actualPos;
 
-unsigned int CONST_POLAR_PAIRS = 14;
+extern float tempa;
+extern float tempb;
 
+AS5600_TypeDef* encoder;
+
+extern float angle_elec;
 
 
 /* USER CODE END PV */
@@ -90,9 +98,9 @@ int main(void)
 {
   /* USER CODE BEGIN 1 */
 
-    float angle_elec;
-    AS5600_TypeDef* sensor = AS5600_new();
-    sensor->i2c_handle = &hi2c1;
+//    float angle_elec;
+    encoder = AS5600_new();
+    encoder->i2c_handle = &hi2c1;
     // sensor->dir_port = dir_GPIO_Port;
     // sensor->dir_pin = dir_Pin;
   /* USER CODE END 1 */
@@ -118,33 +126,66 @@ int main(void)
   MX_TIM1_Init();
   MX_USART2_UART_Init();
   MX_ADC1_Init();
-  MX_ADC2_Init();
   MX_I2C1_Init();
+  MX_TIM2_Init();
+  MX_TIM3_Init();
+  MX_TIM4_Init();
   /* USER CODE BEGIN 2 */
     HAL_GPIO_WritePin(GPIOC, GPIO_PIN_13, GPIO_PIN_RESET);
+    AS5600_init(encoder);
+    angle_elec = 0.0;
+    
+    for(int i = 0; i < 500; i++){
+        setPhaseVoltage(0.5, 0.0);
+    }
+    
+    HAL_Delay(1000);
+    
+    HAL_TIM_Base_Start_IT(&htim1);
+    HAL_TIM_Base_Start_IT(&htim2);
+    HAL_TIM_Base_Start_IT(&htim3);
+    HAL_TIM_Base_Start_IT(&htim4);
     HAL_TIM_PWM_Start(&htim1,TIM_CHANNEL_1);
     HAL_TIM_PWM_Start(&htim1,TIM_CHANNEL_2);
     HAL_TIM_PWM_Start(&htim1,TIM_CHANNEL_3);
-    AS5600_init(sensor);
+    
+    
+    HAL_Delay(2000);
+    
+    
   /* USER CODE END 2 */
 
   /* Infinite loop */
   /* USER CODE BEGIN WHILE */
   while (1)
   {
-      uint16_t angle;
-        //AS5600_get_angle(sensor, &angle);
-      //HAL_GPIO_WritePin(GPIOC, GPIO_PIN_13, GPIO_PIN_SET);
-      AS5600_get_rawAngle(sensor, &angle);
-      //printf("%d\r\n", angle);
-      //HAL_GPIO_WritePin(GPIOC, GPIO_PIN_13, GPIO_PIN_RESET);
-      //HAL_Delay(50);
-      angle_elec = (float)angle * (2 * 3.1415926) / 4096 * CONST_POLAR_PAIRS;
-      setPhaseVoltage(0.1, 0, angle_elec);
+//      uint16_t angle;
+//        //AS5600_get_angle(sensor, &angle);
+      
+//      HAL_GPIO_WritePin(GPIOC, GPIO_PIN_13, GPIO_PIN_SET);
+//      AS5600_get_rawAngle(encoder, &actualPos);
+//      //printf("%d\r\n", angle);
+//      HAL_GPIO_WritePin(GPIOC, GPIO_PIN_13, GPIO_PIN_RESET);
+      
+//      //HAL_Delay(50);
+//      
+//      HAL_GPIO_WritePin(GPIOC, GPIO_PIN_13, GPIO_PIN_SET);
+//      setPhaseVoltage(0.1, 0, angle_elec);
+//      HAL_GPIO_WritePin(GPIOC, GPIO_PIN_13, GPIO_PIN_RESET);
+//      HAL_Delay(10);
+//      HAL_GPIO_TogglePin(GPIOC, GPIO_PIN_13);
+//      angle_elec = (float)actualPos * (2 * 3.1415926) / 4096 * 14;
+//      HAL_GPIO_WritePin(GPIOC, GPIO_PIN_13, GPIO_PIN_RESET);
+//      
+//      setPhaseVoltage(0.5, 0, angle_elec);
+//      HAL_GPIO_WritePin(GPIOC, GPIO_PIN_13, GPIO_PIN_SET);
+      
+      
+      //printf("%d, %d, %d\r\n", actualCurA, actualCurB, actualPos);
+      tempa = ((3.3*((float)actualCurA/4096))-1.65)/0.01/50;      //相电流物理值=（采样电压-偏置）/Rcs/增益  ;  单位：A
+      tempb =((3.3*((float)actualCurB/4096))-1.65)/0.01/50;
+      printf("%f,%f\r\n", tempa, tempb);
       HAL_Delay(10);
-      
-      
-      
     /* USER CODE END WHILE */
 
     /* USER CODE BEGIN 3 */

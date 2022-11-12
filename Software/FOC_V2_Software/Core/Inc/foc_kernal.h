@@ -21,7 +21,8 @@ extern "C" {
 
 /* USER CODE BEGIN Prototypes */
 float _normalizeAngle(float angle);
-void setPhaseVoltage(float Uq, float Ud, float angle_el);
+void setPhaseVoltage(float Uq, float Ud);
+void get_angle_elec(void);
     
 /* USER CODE END Prototypes */
 
