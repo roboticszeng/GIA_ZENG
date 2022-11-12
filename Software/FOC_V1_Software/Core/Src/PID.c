@@ -113,7 +113,7 @@ float PID_angle(float error)
     float Ts_p = 0.004;
 
 	proportional = pid_ang_P * error;
-	integral = integral_ang_prev + pid_ang_I*Ts_p*0.5* + error_ang_prev);
+	integral = integral_ang_prev + pid_ang_I*Ts_p*0.5*(error + error_ang_prev);
 	//integral = _constrain(output, -velosity_limit, velosity_limit);
 	derivative = pid_vel_D*(error - error_ang_prev)/Ts_p;
 	
