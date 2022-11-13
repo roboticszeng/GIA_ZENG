@@ -19,6 +19,7 @@
 /* Includes ------------------------------------------------------------------*/
 #include "main.h"
 #include "adc.h"
+#include "dma.h"
 #include "i2c.h"
 #include "tim.h"
 #include "usart.h"
@@ -119,6 +120,8 @@ PIDController PID_Current_Q = { 1.0, 0.0, 0.0,
                       500e-6 };
 
 
+extern uint16_t ADC_DMA_BUFF[NUMBER_ADC_CHANNEL * NUMBER_ADC_CHANNEL_AVERAGE_PER_CHANNEL];
+
 /* USER CODE END 0 */
 
 /**
@@ -137,7 +140,7 @@ int main(void)
     
 
 
-    //PIDController_Init(&PID_Current_Q);
+    PIDController_Init(&PID_Current_Q);
     
     
     
@@ -161,6 +164,7 @@ int main(void)
 
   /* Initialize all configured peripherals */
   MX_GPIO_Init();
+  MX_DMA_Init();
   MX_TIM1_Init();
   MX_USART2_UART_Init();
   MX_ADC1_Init();
@@ -176,12 +180,13 @@ int main(void)
         setPhaseVoltage(0.5, 0.0, 0.0);
         HAL_Delay(1);
     }
-    
-    
+    //HAL_ADC_Start(&hadc1);
+    HAL_ADC_Start_DMA(&hadc1, (uint32_t *)ADC_DMA_BUFF, NUMBER_ADC_CHANNEL * NUMBER_ADC_CHANNEL_AVERAGE_PER_CHANNEL);
+
     HAL_TIM_Base_Start_IT(&htim1);
     HAL_TIM_Base_Start_IT(&htim2);
     HAL_TIM_Base_Start_IT(&htim3);
-    HAL_TIM_Base_Start_IT(&htim4);
+    //HAL_TIM_Base_Start_IT(&htim4);
     HAL_TIM_PWM_Start(&htim1,TIM_CHANNEL_1);
     HAL_TIM_PWM_Start(&htim1,TIM_CHANNEL_2);
     HAL_TIM_PWM_Start(&htim1,TIM_CHANNEL_3);
@@ -216,12 +221,13 @@ int main(void)
 //      
 //      setPhaseVoltage(0.5, 0, angle_elec);
 //      HAL_GPIO_WritePin(GPIOC, GPIO_PIN_13, GPIO_PIN_SET);
+//      actualCurA = ADC_DMA_AVERAGE(0);
+//      actualCurB = ADC_DMA_AVERAGE(1);
       
-      
-      printf("%d, %d, %d\r\n", actualCurA, actualCurB, actualPos);
+//      printf("%d, %d, %d\r\n", actualCurA, actualCurB, actualPos);
 //      tempa = ((3.3*((float)actualCurA/4096))-1.65)/0.01/50;      //相电流物理值=（采样电压-偏置）/Rcs/增益  ;  单位：A
 //      tempb =((3.3*((float)actualCurB/4096))-1.65)/0.01/50;
-//      printf("%f,%f\r\n", tempa, tempb);
+      printf("%f,%f\r\n", tempa, tempb);
 //        printf("%d, %d, %d  %f, %f, %f, %f, %f  %d\r\n", Pa, Pb, Pc, Pf1, Pf2, Pf3, Pf4, Pf5, actualPos);
 ////        printf("%f, %f, %d\r\n", Pf1, Pf2, actualPos);
 //      printf("%d, %d, %d, %d, %d, %d\r\n", Pa, Pb, Pc, Pa_old, Pb_old, Pc_old);

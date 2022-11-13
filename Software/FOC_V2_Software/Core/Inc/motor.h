@@ -1,7 +1,7 @@
 
 /* Define to prevent recursive inclusion -------------------------------------*/
-#ifndef __PID_CONTROLLER_H__
-#define __PID_CONTROLLER_H__
+#ifndef __MOTOR_H__
+#define __MOTOR_H__
 
 #ifdef __cplusplus
 extern "C" {
@@ -50,10 +50,8 @@ typedef struct {
 	/* Controller output */
 	float out;
 
-} PIDController;
+} driver;
 
-void  PIDController_Init(PIDController *pid);
-float PIDController_Update(PIDController *pid, float setpoint, float measurement);
     
 /* USER CODE END Prototypes */
 
@@ -61,4 +59,4 @@ float PIDController_Update(PIDController *pid, float setpoint, float measurement
 }
 #endif
 
-#endif /* __PID_CONTROLLER_H__ */
+#endif /* __MOTOR_H__ */

@@ -90,6 +90,7 @@ float tempa, tempb;
 /* USER CODE END 0 */
 
 /* External variables --------------------------------------------------------*/
+extern DMA_HandleTypeDef hdma_adc1;
 extern TIM_HandleTypeDef htim1;
 extern TIM_HandleTypeDef htim2;
 extern TIM_HandleTypeDef htim3;
@@ -237,13 +238,27 @@ void SysTick_Handler(void)
 /******************************************************************************/
 
 /**
+  * @brief This function handles DMA1 channel1 global interrupt.
+  */
+void DMA1_Channel1_IRQHandler(void)
+{
+  /* USER CODE BEGIN DMA1_Channel1_IRQn 0 */
+
+  /* USER CODE END DMA1_Channel1_IRQn 0 */
+  HAL_DMA_IRQHandler(&hdma_adc1);
+  /* USER CODE BEGIN DMA1_Channel1_IRQn 1 */
+
+  /* USER CODE END DMA1_Channel1_IRQn 1 */
+}
+
+/**
   * @brief This function handles TIM1 update interrupt.
   */
 void TIM1_UP_IRQHandler(void)
 {
   /* USER CODE BEGIN TIM1_UP_IRQn 0 */
 
-    static _iq I_alpha, I_beta, I_d, I_q;
+    static _iq Ia, Ib, I_alpha, I_beta, I_d, I_q;
     
   /* USER CODE END TIM1_UP_IRQn 0 */
   HAL_TIM_IRQHandler(&htim1);
@@ -257,8 +272,17 @@ void TIM1_UP_IRQHandler(void)
 //    Id = K1 * (_sin(angle_elec + _PI_3) * actualCurA + _sin(angle_elec) * actualCurB) + K2 * _sin(angle_elec + _PI_6);
 //    Iq = K1 * (_cos(angle_elec + _PI_3) * actualCurA + _cos(angle_elec) * actualCurB) + K2 * _cos(angle_elec + _PI_6);
     
-    I_alpha = _IQ(actualCurA);
-    I_beta = _IQmpy(_IQ(_1_SQRT3), _IQ(actualCurA)) + _IQmpy(_IQ(_2_SQRT3), _IQ(actualCurB));
+    Ia = _IQmpy(_IQ(actualCurA), _IQ(16e-4)) - _IQ(3.3);
+    Ib = _IQmpy(_IQ(actualCurB), _IQ(16e-4)) - _IQ(3.3);
+    
+//    Ia = _IQ(actualCurA * 16e-4 - 3.3);
+//    Ib = _IQ(actualCurB * 16e-4 - 3.3);
+    
+    
+//    I_alpha = _IQ(actualCurA);
+//    I_beta = _IQmpy(_IQ(_1_SQRT3), _IQ(actualCurA)) + _IQmpy(_IQ(_2_SQRT3), _IQ(actualCurB));
+    I_alpha = Ia;
+    I_beta = _IQmpy(_IQ(_1_SQRT3), Ia) + _IQmpy(_IQ(_2_SQRT3), Ib);
     I_d = _IQmpy(I_alpha, _IQcos(_IQ(angle_elec))) + _IQmpy(I_beta, _IQsin(_IQ(angle_elec)));
     I_q = _IQmpy(I_beta, _IQcos(_IQ(angle_elec))) - _IQmpy(I_alpha, _IQsin(_IQ(angle_elec)));
     
@@ -285,12 +309,11 @@ void TIM2_IRQHandler(void)
   HAL_TIM_IRQHandler(&htim2);
   /* USER CODE BEGIN TIM2_IRQn 1 */
     
-//    HAL_GPIO_WritePin(GPIOC, GPIO_PIN_13, GPIO_PIN_SET);
+    // HAL_GPIO_WritePin(GPIOC, GPIO_PIN_13, GPIO_PIN_SET);
     // 获取角度原始信息
     AS5600_get_rawAngle(encoder, &actualPos);
-    
     get_angle_elec();
-//    HAL_GPIO_WritePin(GPIOC, GPIO_PIN_13, GPIO_PIN_RESET);
+    // HAL_GPIO_WritePin(GPIOC, GPIO_PIN_13, GPIO_PIN_RESET);
   /* USER CODE END TIM2_IRQn 1 */
 }
 
@@ -307,10 +330,14 @@ void TIM3_IRQHandler(void)
   HAL_TIM_IRQHandler(&htim3);
   /* USER CODE BEGIN TIM3_IRQn 1 */
 //    HAL_GPIO_WritePin(GPIOC, GPIO_PIN_13, GPIO_PIN_SET);
+     
     
-    setPhaseVoltage(0.2, 0, a);
+    PIDController_Update(&PID_Current_Q, 0.2, tempb / 24);
+    setPhaseVoltage(PID_Current_Q.out, 0, angle_elec);
+//    setPhaseVoltage(0.2, 0, angle_elec);
     
-//    a += 0.002;
+//    a = a + 0.002;
+    
 //    HAL_GPIO_WritePin(GPIOC, GPIO_PIN_13, GPIO_PIN_RESET);
     
 //    

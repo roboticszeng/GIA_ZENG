@@ -22,7 +22,7 @@ float _normalizeAngle(float angle)
 
 
 void get_angle_elec(void){
-    //angle_elec = _IQ10toF(_IQ10div( _IQ10mpy(_IQ10(actualPos * CONST_POLAR_PAIRS), _IQ10(_2PI)), _IQ10(CONST_ENC_RESOLUTION)));
+    // angle_elec = _IQ10toF(_IQ10div( _IQ10mpy(_IQ10(actualPos * CONST_POLAR_PAIRS), _IQ10(_2PI)), _IQ10(CONST_ENC_RESOLUTION)));
     angle_elec = actualPos * CONST_POLAR_PAIRS * _2PI / CONST_ENC_RESOLUTION;
     angle_elec = _normalizeAngle(angle_elec); // 电角度标准化在[0, _2PI]
 }
@@ -37,7 +37,7 @@ float Pf[8];
 int Pa_old, Pb_old, Pc_old;
 float Pf_old[8];
 //FOC核心函数：输入Ud、Uq和电角度，输出PWM
-void setPhaseVoltage(float Uq, float Ud, float angle_elec)
+void setPhaseVoltage(float Uq, float Ud, float angle_el)
 {
 	_iq Uref;
 	// _iq sector;
@@ -47,20 +47,22 @@ void setPhaseVoltage(float Uq, float Ud, float angle_elec)
 	
 	_iq U_alpha,U_beta;
     
-    _iq angle_eq;
+    _iq angle_eiq;
 	
     if(Uq > 0){
-        angle_elec = _normalizeAngle(angle_elec + _PI_2);            //加90度后是参考电压矢量的位置
+//        angle_el += _PI_2;
+        angle_el = _normalizeAngle(angle_el + _PI_2);            //加90度后是参考电压矢量的位置
     }
 	else{
-        angle_elec = _normalizeAngle(angle_elec - _PI_2);
+//        angle_el -= _PI_2;
+        angle_el = _normalizeAngle(angle_el - _PI_2);
     }
     
-    angle_eq = _IQ(angle_elec);
+    angle_eiq = _IQ(angle_elec);
 	                    
 
-	U_alpha = _IQmpy(_IQ(Ud), _IQcos(angle_eq)) - _IQmpy(_IQ(Uq), _IQsin(angle_eq));            //反park变换
-	U_beta = _IQmpy(_IQ(Ud), _IQsin(angle_eq)) + _IQmpy(_IQ(Uq), _IQcos(angle_eq));
+	U_alpha = _IQmpy(_IQ(Ud), _IQcos(angle_eiq)) - _IQmpy(_IQ(Uq), _IQsin(angle_eiq));            //反park变换
+	U_beta = _IQmpy(_IQ(Ud), _IQsin(angle_eiq)) + _IQmpy(_IQ(Uq), _IQcos(angle_eiq));
 	
     Uref = _IQsqrt(_IQmpy(U_alpha, U_alpha) + _IQmpy(U_beta, U_beta));
 	
@@ -73,10 +75,10 @@ void setPhaseVoltage(float Uq, float Ud, float angle_elec)
 	
 
 		
-	sector = _IQint(_IQdiv(angle_eq, _IQ(_PI_3))) + 1;                			//根据角度判断参考电压所在扇区                        
+	sector = _IQint(_IQdiv(angle_eiq, _IQ(_PI_3))) + 1;                			//根据角度判断参考电压所在扇区                        
 
-	T1 = _IQmpy(_IQmpy(_IQ(_SQRT3), Uref), _IQsin(_IQ(sector * _PI_3 - angle_elec)));           //计算两个相邻电压矢量作用时间
-	T2 = _IQmpy(_IQmpy(_IQ(_SQRT3), Uref), _IQsin(_IQ(angle_elec - (sector - 1) * _PI_3)));
+	T1 = _IQmpy(_IQmpy(_IQ(_SQRT3), Uref), _IQsin(_IQ(sector * _PI_3 - angle_el)));           //计算两个相邻电压矢量作用时间
+	T2 = _IQmpy(_IQmpy(_IQ(_SQRT3), Uref), _IQsin(_IQ(angle_el - (sector - 1) * _PI_3)));
 	T0 = _IQ(1.0) - T1 - T2;                                          //零矢量作用时间
 	
 	switch(sector) 

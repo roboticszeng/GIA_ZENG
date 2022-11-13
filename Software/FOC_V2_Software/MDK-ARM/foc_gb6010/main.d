@@ -32,6 +32,7 @@ foc_gb6010\main.o: ../Drivers/STM32F1xx_HAL_Driver/Inc/stm32f1xx_hal_tim.h
 foc_gb6010\main.o: ../Drivers/STM32F1xx_HAL_Driver/Inc/stm32f1xx_hal_tim_ex.h
 foc_gb6010\main.o: ../Drivers/STM32F1xx_HAL_Driver/Inc/stm32f1xx_hal_uart.h
 foc_gb6010\main.o: ../Core/Inc/adc.h
+foc_gb6010\main.o: ../Core/Inc/dma.h
 foc_gb6010\main.o: ../Core/Inc/i2c.h
 foc_gb6010\main.o: ../Core/Inc/tim.h
 foc_gb6010\main.o: ../Core/Inc/usart.h
