@@ -129,6 +129,7 @@ int main(void)
 {
   /* USER CODE BEGIN 1 */
 
+    
 
   /* USER CODE END 1 */
 
@@ -176,18 +177,21 @@ int main(void)
     for (int j = 0; j < 50; j++){
         setPhaseVoltage(6, 0, 0);
     }
-    HAL_TIM_Base_Start_IT(&htim2);
-    HAL_TIM_Base_Start_IT(&htim3);
-    HAL_TIM_Base_Start_IT(&htim4);
-
+//    HAL_TIM_Base_Start_IT(&htim2);
+//    HAL_TIM_Base_Start_IT(&htim3);
+//    HAL_TIM_Base_Start_IT(&htim4);
+    float a = 0.0;
   /* USER CODE END 2 */
 
   /* Infinite loop */
   /* USER CODE BEGIN WHILE */
   while (1)
   {      
-      printf("%f,%f,%f,%f,%f,%f,%f,%f,%d,%d\n", angle, ang_sp, vel, vel_sp, Current.q, currentQ_sp, Current.d, currentD_sp, \
-      AD_Value_0, AD_Value_1);
+//      printf("%f,%f,%f,%f,%f,%f,%f,%f,%d,%d\n", angle, ang_sp, vel, vel_sp, Current.q, currentQ_sp, Current.d, currentD_sp, \
+//      AD_Value_0, AD_Value_1);
+//      HAL_Delay(10);
+      setPhaseVoltage(6.0, 0.0, a);
+      a += 0.01;
       HAL_Delay(10);
     /* USER CODE END WHILE */
 
