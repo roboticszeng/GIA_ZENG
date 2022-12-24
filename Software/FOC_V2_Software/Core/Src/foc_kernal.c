@@ -123,6 +123,10 @@ void setPhaseVoltage(float Uq, float Ud, float angle_el)
     Pb = _IQint(_IQmpy(Tb, _IQ(PWM_PERIOD)));
     Pc = _IQint(_IQmpy(Tc, _IQ(PWM_PERIOD)));
     
+//    Pa = PWM_PERIOD;
+//    Pb = 0.5 * PWM_PERIOD;
+//    Pc = 0.2 * PWM_PERIOD;
+    
     
 	__HAL_TIM_SET_COMPARE(&htim1,TIM_CHANNEL_1, Pa);      //Êä³öPWMµÄº¯Êý
 	__HAL_TIM_SET_COMPARE(&htim1,TIM_CHANNEL_2, Pb);

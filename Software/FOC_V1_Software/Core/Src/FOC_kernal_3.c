@@ -128,9 +128,6 @@ void setPhaseVoltage(float Uq, float Ud, float angle_el)
 			Tc = 0;
 	}
     
-    Ta = 0.2;
-    Tb = 0.4;
-    Tc = 0.2;
     
 	__HAL_TIM_SET_COMPARE(&htim1,TIM_CHANNEL_1,Ta*PWM_Period);      //Êä³öPWMµÄº¯Êý
 	__HAL_TIM_SET_COMPARE(&htim1,TIM_CHANNEL_2,Tb*PWM_Period);

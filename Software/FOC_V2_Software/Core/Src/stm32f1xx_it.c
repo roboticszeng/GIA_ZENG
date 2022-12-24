@@ -57,7 +57,7 @@ uint16_t targetPos;
 uint16_t targetVel;
 uint16_t targetCurQ;
 uint16_t actualPos;
-uint16_t actualVel;
+int16_t actualVel;
 uint16_t actualCurA;
 uint16_t actualCurB;
 uint16_t actualCurQ;
@@ -71,12 +71,14 @@ uint16_t limitedCurQ;
 
 extern float angle_elec;
 extern PIDController PID_Current_Q;
-
+extern PIDController PID_Velocity;
+extern PIDController PID_Position;
 
 int angle_elec_int;
 int K1 = 19;
 int K2 = -66000;
 float tempa, tempb;
+float targetQ;
 /* USER CODE END PV */
 
 /* Private function prototypes -----------------------------------------------*/
@@ -91,11 +93,14 @@ float tempa, tempb;
 
 /* External variables --------------------------------------------------------*/
 extern DMA_HandleTypeDef hdma_adc1;
+extern CAN_HandleTypeDef hcan;
 extern TIM_HandleTypeDef htim1;
 extern TIM_HandleTypeDef htim2;
 extern TIM_HandleTypeDef htim3;
 extern TIM_HandleTypeDef htim4;
 /* USER CODE BEGIN EV */
+
+
 
 /* USER CODE END EV */
 
@@ -252,11 +257,40 @@ void DMA1_Channel1_IRQHandler(void)
 }
 
 /**
+  * @brief This function handles USB high priority or CAN TX interrupts.
+  */
+void USB_HP_CAN1_TX_IRQHandler(void)
+{
+  /* USER CODE BEGIN USB_HP_CAN1_TX_IRQn 0 */
+
+  /* USER CODE END USB_HP_CAN1_TX_IRQn 0 */
+  HAL_CAN_IRQHandler(&hcan);
+  /* USER CODE BEGIN USB_HP_CAN1_TX_IRQn 1 */
+
+  /* USER CODE END USB_HP_CAN1_TX_IRQn 1 */
+}
+
+/**
+  * @brief This function handles USB low priority or CAN RX0 interrupts.
+  */
+void USB_LP_CAN1_RX0_IRQHandler(void)
+{
+  /* USER CODE BEGIN USB_LP_CAN1_RX0_IRQn 0 */
+
+  /* USER CODE END USB_LP_CAN1_RX0_IRQn 0 */
+  HAL_CAN_IRQHandler(&hcan);
+  /* USER CODE BEGIN USB_LP_CAN1_RX0_IRQn 1 */
+
+  /* USER CODE END USB_LP_CAN1_RX0_IRQn 1 */
+}
+
+/**
   * @brief This function handles TIM1 update interrupt.
   */
 void TIM1_UP_IRQHandler(void)
 {
   /* USER CODE BEGIN TIM1_UP_IRQn 0 */
+    // TIM1 -- 电流采样 频率 XHZ
 
     static _iq Ia, Ib, I_alpha, I_beta, I_d, I_q;
     
@@ -265,7 +299,7 @@ void TIM1_UP_IRQHandler(void)
   /* USER CODE BEGIN TIM1_UP_IRQn 1 */
     
     
-    HAL_GPIO_WritePin(GPIOC, GPIO_PIN_13, GPIO_PIN_SET);
+//    HAL_GPIO_WritePin(GPIOC, GPIO_PIN_13, GPIO_PIN_SET);
     // 电流采样 实测时间42.5us
     ADC_get_voltage();
     
@@ -293,7 +327,7 @@ void TIM1_UP_IRQHandler(void)
 //    tempb =((3.3*((float)actualCurB/4096))-1.65)/0.01/50;
     
     
-    HAL_GPIO_WritePin(GPIOC, GPIO_PIN_13, GPIO_PIN_RESET);
+//    HAL_GPIO_WritePin(GPIOC, GPIO_PIN_13, GPIO_PIN_RESET);
 
   /* USER CODE END TIM1_UP_IRQn 1 */
 }
@@ -304,6 +338,8 @@ void TIM1_UP_IRQHandler(void)
 void TIM2_IRQHandler(void)
 {
   /* USER CODE BEGIN TIM2_IRQn 0 */
+    static uint16_t lastPos;
+    // TIM2 编码器计数 频率 XHZ
 
   /* USER CODE END TIM2_IRQn 0 */
   HAL_TIM_IRQHandler(&htim2);
@@ -311,8 +347,11 @@ void TIM2_IRQHandler(void)
     
     // HAL_GPIO_WritePin(GPIOC, GPIO_PIN_13, GPIO_PIN_SET);
     // 获取角度原始信息
+    lastPos = actualPos;
     AS5600_get_rawAngle(encoder, &actualPos);
     get_angle_elec();
+    actualVel = (actualPos - lastPos) / 1e-3;
+    
     // HAL_GPIO_WritePin(GPIOC, GPIO_PIN_13, GPIO_PIN_RESET);
   /* USER CODE END TIM2_IRQn 1 */
 }
@@ -324,19 +363,23 @@ void TIM3_IRQHandler(void)
 {
   /* USER CODE BEGIN TIM3_IRQn 0 */
     static float a;
-//    static float a, b;
-//    int Id, Iq;
+    // TIM3 电流环控制 频率 XHZ
   /* USER CODE END TIM3_IRQn 0 */
   HAL_TIM_IRQHandler(&htim3);
   /* USER CODE BEGIN TIM3_IRQn 1 */
 //    HAL_GPIO_WritePin(GPIOC, GPIO_PIN_13, GPIO_PIN_SET);
      
     
-    PIDController_Update(&PID_Current_Q, 0.2, tempb / 24);
-    setPhaseVoltage(PID_Current_Q.out, 0, angle_elec);
+//    PIDController_Update(&PID_Current_Q, 0.2, tempb / 24);
+//    setPhaseVoltage(PID_Current_Q.out, 0, angle_elec);
 //    setPhaseVoltage(0.2, 0, angle_elec);
     
-//    a = a + 0.002;
+    
+    setPhaseVoltage(targetQ, 0, angle_elec);
+    
+    
+//     a = a + 0.002;
+//     setPhaseVoltage(0.1, 0, a);
     
 //    HAL_GPIO_WritePin(GPIOC, GPIO_PIN_13, GPIO_PIN_RESET);
     
@@ -352,9 +395,11 @@ void TIM4_IRQHandler(void)
 {
   /* USER CODE BEGIN TIM4_IRQn 0 */
 
+    // TIM4 速度位置环控制 频率 XHZ
   /* USER CODE END TIM4_IRQn 0 */
   HAL_TIM_IRQHandler(&htim4);
   /* USER CODE BEGIN TIM4_IRQn 1 */
+    targetQ = PIDController_Update(&PID_Velocity, 2000, actualVel);
 
   /* USER CODE END TIM4_IRQn 1 */
 }

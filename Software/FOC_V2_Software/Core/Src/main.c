@@ -19,6 +19,7 @@
 /* Includes ------------------------------------------------------------------*/
 #include "main.h"
 #include "adc.h"
+#include "can.h"
 #include "dma.h"
 #include "i2c.h"
 #include "tim.h"
@@ -70,6 +71,9 @@ int fputc(int ch, FILE *f) {
 extern uint16_t actualCurA;
 extern uint16_t actualCurB;
 extern uint16_t actualPos;
+extern int16_t actualVel;
+extern int16_t actualCurQ;
+extern int16_t targetCurQ;
 
 extern float tempa;
 extern float tempb;
@@ -118,9 +122,22 @@ PIDController PID_Current_Q = { 1.0, 0.0, 0.0,
                       -1, 1,
           -0.5, 0.5,
                       500e-6 };
+PIDController PID_Velocity = { 3e-5, 2e-5, 0.0,
+                      0.0,
+                      -1, 1,
+          -0.8, 0.8,
+                      1000e-6 };
+PIDController PID_Position = { 1.0, 0.0, 0.0,
+                      0.0,
+                      -1, 1,
+          -0.5, 0.5,
+                      1000e-6 };
 
 
 extern uint16_t ADC_DMA_BUFF[NUMBER_ADC_CHANNEL * NUMBER_ADC_CHANNEL_AVERAGE_PER_CHANNEL];
+                      
+                      
+extern float targetQ;
 
 /* USER CODE END 0 */
 
@@ -172,25 +189,28 @@ int main(void)
   MX_TIM2_Init();
   MX_TIM3_Init();
   MX_TIM4_Init();
+  MX_CAN_Init();
   /* USER CODE BEGIN 2 */
+    HAL_GPIO_WritePin(DRV_EN_GPIO_Port, DRV_EN_Pin, GPIO_PIN_SET);
     HAL_GPIO_WritePin(GPIOC, GPIO_PIN_13, GPIO_PIN_RESET);
+    HAL_GPIO_WritePin(SENS_DIR_GPIO_Port, SENS_DIR_Pin, GPIO_PIN_RESET);
     AS5600_init(encoder);
     
-    for(int i = 0; i < 500; i++){
-        setPhaseVoltage(0.5, 0.0, 0.0);
-        HAL_Delay(1);
-    }
-    //HAL_ADC_Start(&hadc1);
+    
     HAL_ADC_Start_DMA(&hadc1, (uint32_t *)ADC_DMA_BUFF, NUMBER_ADC_CHANNEL * NUMBER_ADC_CHANNEL_AVERAGE_PER_CHANNEL);
 
     HAL_TIM_Base_Start_IT(&htim1);
     HAL_TIM_Base_Start_IT(&htim2);
     HAL_TIM_Base_Start_IT(&htim3);
-    //HAL_TIM_Base_Start_IT(&htim4);
+    HAL_TIM_Base_Start_IT(&htim4);
     HAL_TIM_PWM_Start(&htim1,TIM_CHANNEL_1);
     HAL_TIM_PWM_Start(&htim1,TIM_CHANNEL_2);
     HAL_TIM_PWM_Start(&htim1,TIM_CHANNEL_3);
     
+    for(int i = 0; i < 500; i++){
+        setPhaseVoltage(0.5, 0.0, 0.0);
+        HAL_Delay(10);
+    }
     
     HAL_Delay(2000);
     
@@ -201,6 +221,7 @@ int main(void)
   /* USER CODE BEGIN WHILE */
   while (1)
   {
+      // AS5600_get_rawAngle(encoder, &actualPos);
 //      uint16_t angle;
 //        //AS5600_get_angle(sensor, &angle);
       
@@ -227,7 +248,7 @@ int main(void)
 //      printf("%d, %d, %d\r\n", actualCurA, actualCurB, actualPos);
 //      tempa = ((3.3*((float)actualCurA/4096))-1.65)/0.01/50;      //相电流物理值=（采样电压-偏置）/Rcs/增益  ;  单位：A
 //      tempb =((3.3*((float)actualCurB/4096))-1.65)/0.01/50;
-      printf("%f,%f\r\n", tempa, tempb);
+      // printf("%f,%f\r\n", tempa, tempb);
 //        printf("%d, %d, %d  %f, %f, %f, %f, %f  %d\r\n", Pa, Pb, Pc, Pf1, Pf2, Pf3, Pf4, Pf5, actualPos);
 ////        printf("%f, %f, %d\r\n", Pf1, Pf2, actualPos);
 //      printf("%d, %d, %d, %d, %d, %d\r\n", Pa, Pb, Pc, Pa_old, Pb_old, Pc_old);
@@ -235,6 +256,10 @@ int main(void)
 //          printf("%.4f, %.4f,     ", Pf[i], Pf_old[i]);
 //      }
 //      printf("\r\n");
+    // setPhaseVoltage(0.5, 0.0, 0.0);
+    printf("%d, %d, %f\r\n", actualPos, actualVel, targetQ);
+    HAL_GPIO_TogglePin(GPIOC, GPIO_PIN_13);
+    
       HAL_Delay(100);
     /* USER CODE END WHILE */
 
