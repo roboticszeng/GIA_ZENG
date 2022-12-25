@@ -345,14 +345,14 @@ void TIM2_IRQHandler(void)
   HAL_TIM_IRQHandler(&htim2);
   /* USER CODE BEGIN TIM2_IRQn 1 */
     
-    // HAL_GPIO_WritePin(GPIOC, GPIO_PIN_13, GPIO_PIN_SET);
+//     HAL_GPIO_WritePin(GPIOC, GPIO_PIN_13, GPIO_PIN_SET);
     // 获取角度原始信息
     lastPos = actualPos;
     AS5600_get_rawAngle(encoder, &actualPos);
     get_angle_elec();
-    actualVel = (actualPos - lastPos) / 1e-3;
+    actualVel = (actualPos - lastPos) * 1000;
     
-    // HAL_GPIO_WritePin(GPIOC, GPIO_PIN_13, GPIO_PIN_RESET);
+//     HAL_GPIO_WritePin(GPIOC, GPIO_PIN_13, GPIO_PIN_RESET);
   /* USER CODE END TIM2_IRQn 1 */
 }
 
@@ -367,21 +367,21 @@ void TIM3_IRQHandler(void)
   /* USER CODE END TIM3_IRQn 0 */
   HAL_TIM_IRQHandler(&htim3);
   /* USER CODE BEGIN TIM3_IRQn 1 */
-//    HAL_GPIO_WritePin(GPIOC, GPIO_PIN_13, GPIO_PIN_SET);
+    HAL_GPIO_WritePin(GPIOC, GPIO_PIN_13, GPIO_PIN_SET);
      
     
 //    PIDController_Update(&PID_Current_Q, 0.2, tempb / 24);
 //    setPhaseVoltage(PID_Current_Q.out, 0, angle_elec);
 //    setPhaseVoltage(0.2, 0, angle_elec);
     
-    
+    targetQ = PIDController_Update(&PID_Velocity, 2000, actualVel);
     setPhaseVoltage(targetQ, 0, angle_elec);
     
     
 //     a = a + 0.002;
 //     setPhaseVoltage(0.1, 0, a);
     
-//    HAL_GPIO_WritePin(GPIOC, GPIO_PIN_13, GPIO_PIN_RESET);
+    HAL_GPIO_WritePin(GPIOC, GPIO_PIN_13, GPIO_PIN_RESET);
     
 //    
 
@@ -395,11 +395,15 @@ void TIM4_IRQHandler(void)
 {
   /* USER CODE BEGIN TIM4_IRQn 0 */
 
+//    HAL_GPIO_WritePin(GPIOC, GPIO_PIN_13, GPIO_PIN_SET);
     // TIM4 速度位置环控制 频率 XHZ
   /* USER CODE END TIM4_IRQn 0 */
   HAL_TIM_IRQHandler(&htim4);
   /* USER CODE BEGIN TIM4_IRQn 1 */
     targetQ = PIDController_Update(&PID_Velocity, 2000, actualVel);
+    targetQ = PIDController_Update(&PID_Velocity, 2000, actualVel);
+    
+//    HAL_GPIO_WritePin(GPIOC, GPIO_PIN_13, GPIO_PIN_RESET);
 
   /* USER CODE END TIM4_IRQn 1 */
 }

@@ -258,7 +258,7 @@ int main(void)
 //      printf("\r\n");
     // setPhaseVoltage(0.5, 0.0, 0.0);
     printf("%d, %d, %f\r\n", actualPos, actualVel, targetQ);
-    HAL_GPIO_TogglePin(GPIOC, GPIO_PIN_13);
+//    HAL_GPIO_TogglePin(GPIOC, GPIO_PIN_13);
     
       HAL_Delay(100);
     /* USER CODE END WHILE */
