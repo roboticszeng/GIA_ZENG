@@ -32,3 +32,6 @@ foc_gb6010\as5600.o: ../Drivers/STM32F1xx_HAL_Driver/Inc/stm32f1xx_hal_pwr.h
 foc_gb6010\as5600.o: ../Drivers/STM32F1xx_HAL_Driver/Inc/stm32f1xx_hal_tim.h
 foc_gb6010\as5600.o: ../Drivers/STM32F1xx_HAL_Driver/Inc/stm32f1xx_hal_tim_ex.h
 foc_gb6010\as5600.o: ../Drivers/STM32F1xx_HAL_Driver/Inc/stm32f1xx_hal_uart.h
+foc_gb6010\as5600.o: ../Core/Inc/i2c.h
+foc_gb6010\as5600.o: ../Core/Inc/main.h
+foc_gb6010\as5600.o: ../Core/Inc/gpio.h

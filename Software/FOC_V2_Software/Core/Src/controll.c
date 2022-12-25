@@ -1,0 +1,233 @@
+#include "controll.h"
+#include "tim.h"
+#include <math.h>
+#include "IQmathLib.h"
+
+float temp[10];
+
+/***********************************************************************************************************************************************/
+/*** PID ***/
+
+pid_typedef* pid_new(void) { 
+    
+    return (pid_typedef*)calloc(1, sizeof(pid_typedef)); 
+}
+
+void pid_init(pid_typedef *handle, float Kp, float Ki, float T, float Max, float MaxInt) {
+
+	/* Clear controller variables */
+    // 暂时不用Kd
+    
+    handle->Kp = _IQ(Kp);
+    handle->Ki = _IQ(Ki);
+    handle->T = _IQ(T);
+    handle->limMax = _IQ(Max);
+    handle->limMin = -_IQ(Max);
+    handle->limMaxInt = _IQ(MaxInt);
+    handle->limMinInt = -_IQ(MaxInt);
+    
+    handle->Kd = _IQ(0.0);
+    handle->tau = _IQ(0.0);
+	handle->integrator = _IQ(0.0);
+	handle->prevError  = _IQ(0.0);
+	handle->differentiator  = _IQ(0.0);
+	handle->prevMeasurement = _IQ(0.0);
+	handle->out = _IQ(0.0);
+
+}
+
+_iq pid_update(pid_typedef *pid, _iq setpoint, _iq measurement) {
+
+    static _iq error;
+    error = setpoint - measurement;
+    pid->proportional = _IQmpy(pid->Kp, error);
+    pid->integrator = pid->integrator + _IQmpy(_IQmpy(_IQmpy(_IQ(0.5), pid->Ki), pid->T), (error + pid->prevError));
+    if (pid->integrator > pid->limMaxInt) {
+        pid->integrator = pid->limMaxInt;
+    } else if (pid->integrator < pid->limMinInt) {
+        pid->integrator = pid->limMinInt;
+    }
+//    pid->differentiator = -(2.0f * pid->Kd * (measurement - pid->prevMeasurement)	/* Note: derivative on measurement, therefore minus sign in front of equation! */
+//                        + (2.0f * pid->tau - pid->T) * pid->differentiator)
+//                        / (2.0f * pid->tau + pid->T);
+    // 暂时不用KD
+    pid->differentiator = _IQ(0.0);
+    pid->out = pid->proportional + pid->integrator + pid->differentiator;
+    if (pid->out > pid->limMax) {
+        pid->out = pid->limMax;
+    } else if (pid->out < pid->limMin) {
+        pid->out = pid->limMin;
+    }
+    pid->prevError       = error;
+    pid->prevMeasurement = measurement;
+    return pid->out;
+}
+
+/*** PID ***/
+/***********************************************************************************************************************************************/
+
+
+
+
+/***********************************************************************************************************************************************/
+/*** lowpass filter ***/
+
+filter_typedef* filter_new(void){
+    return (filter_typedef*)calloc(1, sizeof(filter_typedef)); 
+}
+
+
+void filter_init(filter_typedef* handle, float freq, float sample_time){
+    
+    float rc = 1.0 / (_2PI * freq);
+    handle->k[0] = _IQ(sample_time / (sample_time + rc));
+    handle->k[1] = _IQ(rc / (sample_time + rc));
+    
+    handle->output[0] = _IQ(0.0);
+    handle->output[1] = _IQ(0.0);
+    
+}
+_iq filter_update(filter_typedef* handle, _iq input){
+    
+    handle->output[1] = handle->output[0];
+    handle->output[0] = _IQmpy(handle->k[0], input) + _IQmpy(handle->k[1], handle->output[1]);
+    
+    return handle->output[0];
+    
+}
+
+/*** lowpass filter ***/
+/***********************************************************************************************************************************************/
+
+
+
+
+
+/***********************************************************************************************************************************************/
+/*** pdo & sdo ***/
+
+
+sdo_typedef* config_new(void) { 
+    
+    return (sdo_typedef*)calloc(1, sizeof(sdo_typedef)); 
+}
+
+void config_init(sdo_typedef *handle){
+    handle->CONST_PWM_PERIOD = _IQ(__HAL_TIM_GET_AUTORELOAD(&htim1));
+    handle->CONST_ENC_RESOLUTION = _IQ(4096);
+    handle->CONST_POLAR_PAIRS = _IQ(14);
+    handle->CONST_ZERO_POSITION = _IQ(0);
+}
+
+pdo_typedef* pdo_new(void) { 
+    
+    return (pdo_typedef*)calloc(1, sizeof(pdo_typedef)); 
+}
+
+void pdo_init(pdo_typedef *handle){
+    handle->angle = _IQ(0.0);
+    handle->angle_elec = _IQ(0.0);
+}
+
+
+/*** pdo & sdo ***/
+/***********************************************************************************************************************************************/
+
+
+
+
+
+/***********************************************************************************************************************************************/
+/*** foc ***/
+
+//FOC核心函数：输入Ud、Uq和电角度，输出PWM
+extern sdo_typedef* oConfig;
+void compute_svpwm(_iq Uq, _iq Ud, _iq angle_elec)
+{
+	static _iq Uref;
+	static _iq T0,T1,T2;
+    static _iq Ta,Tb,Tc;
+    static uint8_t sector;
+    static int Pa, Pb, Pc;
+	static _iq U_alpha,U_beta;
+    
+    if(Uq > 0){
+        angle_elec = angle_elec + _IQ(_PI_2);
+    }
+	else{
+        angle_elec = angle_elec - _IQ(_PI_2);
+    }
+
+	U_alpha = _IQmpy(Ud, _IQcos(angle_elec)) - _IQmpy(Uq, _IQsin(angle_elec));            //反park变换
+	U_beta = _IQmpy(Ud, _IQsin(angle_elec)) + _IQmpy(Uq, _IQcos(angle_elec));
+	
+    Uref = _IQsqrt(_IQmpy(U_alpha, U_alpha) + _IQmpy(U_beta, U_beta));
+	
+	if(Uref > _IQ(_1_SQRT3)){
+        Uref = _IQ(_1_SQRT3);                     			//六边形的内切圆(SVPWM最大不失真旋转电压矢量赋值)根号3/3
+    }
+	if(Uref < _IQ(-_1_SQRT3)){
+        Uref = _IQ(-_1_SQRT3);
+    }
+	
+	sector = _IQint(_IQdiv(angle_elec, _IQ(_PI_3)));                			//根据角度判断参考电压所在扇区                        
+    sector = sector % 6 + 1;
+	T1 = _IQmpy(_IQmpy(_IQ(_SQRT3), Uref), _IQsin(_IQ(sector * _PI_3) - angle_elec));           //计算两个相邻电压矢量作用时间
+	T2 = _IQmpy(_IQmpy(_IQ(_SQRT3), Uref), _IQsin(angle_elec - _IQmpy(_IQ(sector - 1), _IQ(_PI_3))));
+	T0 = _IQ(1.0) - T1 - T2;                                          //零矢量作用时间
+	
+	switch(sector) 
+	{
+		case 1:
+			Ta = T1 + T2 + _IQmpy(_IQ(0.5), T0);
+			Tb = T2 + _IQmpy(_IQ(0.5), T0);
+			Tc = _IQmpy(_IQ(0.5), T0);
+			break;
+		case 2:
+			Ta = T1 + _IQmpy(_IQ(0.5), T0);
+			Tb = T1 + T2 + _IQmpy(_IQ(0.5), T0);
+			Tc = _IQmpy(_IQ(0.5), T0);
+			break;
+		case 3:
+			Ta = _IQmpy(_IQ(0.5), T0);
+			Tb = T1 + T2 + _IQmpy(_IQ(0.5), T0);
+			Tc = T2 + _IQmpy(_IQ(0.5), T0);
+			break;
+		case 4:
+			Ta = _IQmpy(_IQ(0.5), T0);
+			Tb = T1+ _IQmpy(_IQ(0.5), T0);
+			Tc = T1 + T2 + _IQmpy(_IQ(0.5), T0);
+			break;
+		case 5:
+			Ta = T2 + _IQmpy(_IQ(0.5), T0);
+			Tb = _IQmpy(_IQ(0.5), T0);
+			Tc = T1 + T2 + _IQmpy(_IQ(0.5), T0);
+			break;
+		case 6:
+			Ta = T1 + T2 + _IQmpy(_IQ(0.5), T0);
+			Tb = _IQmpy(_IQ(0.5), T0);
+			Tc = T1 + _IQmpy(_IQ(0.5), T0);
+			break;
+		default:  // possible error state
+			Ta = 0.0;
+			Tb = 0.0;
+			Tc = 0.0;
+	}
+    
+    Pa = _IQint(_IQmpy(Ta, oConfig->CONST_PWM_PERIOD));
+    Pb = _IQint(_IQmpy(Tb, oConfig->CONST_PWM_PERIOD));
+    Pc = _IQint(_IQmpy(Tc, oConfig->CONST_PWM_PERIOD));
+	__HAL_TIM_SET_COMPARE(&htim1,TIM_CHANNEL_1, Pa);      //输出PWM的函数
+	__HAL_TIM_SET_COMPARE(&htim1,TIM_CHANNEL_2, Pb);
+	__HAL_TIM_SET_COMPARE(&htim1,TIM_CHANNEL_3, Pc);
+
+}
+
+void get_angle_elec(uint16_t pos_enc, pdo_typedef *handle){
+    handle->angle = _IQdiv(_IQmpy(_IQ(pos_enc) - oConfig->CONST_ZERO_POSITION, _IQ(_2PI)), oConfig->CONST_ENC_RESOLUTION);
+    handle->angle_elec = _IQmpy(handle->angle, oConfig->CONST_POLAR_PAIRS);
+}
+
+
+/*** foc ***/
+/***********************************************************************************************************************************************/

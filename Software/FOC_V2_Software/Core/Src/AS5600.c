@@ -1,10 +1,12 @@
 /// includes
 #include "as5600.h"
+#include "i2c.h"
+#include "gpio.h"
 
 /// AS5600 functions
 /* initialization */
-AS5600_TypeDef* AS5600_new(void) { return (AS5600_TypeDef*)calloc(1, sizeof(AS5600_TypeDef)); }
-HAL_StatusTypeDef AS5600_init(AS5600_TypeDef* handle) {
+encoder_typedef* as5600_new(void) { return (encoder_typedef*)calloc(1, sizeof(encoder_typedef)); }
+HAL_StatusTypeDef as5600_init(encoder_typedef* handle) {
 	// set all unspecified fields to their default
 	if (!(handle->i2c_timeout))					{ handle->i2c_timeout = AS5600_I2C_TIMEOUT_DEFAULT; }
 	if (!(handle->positive_rotation_direction))	{ handle->positive_rotation_direction = AS5600_DIR_CW; }
@@ -29,29 +31,31 @@ HAL_StatusTypeDef AS5600_init(AS5600_TypeDef* handle) {
 	if (!(magnet_status & AS5600_MAGNET_DETECTED) \
 		|| (magnet_status & AS5600_AGC_MIN_GAIN_OVERFLOW) \
 		|| (magnet_status & AS5600_AGC_MAX_GAIN_OVERFLOW))										{ return HAL_ERROR; }
+        
+        
 	return HAL_OK;
 }
 
 /* setters */
-HAL_StatusTypeDef AS5600_set_start_position(AS5600_TypeDef* const handle, const uint16_t position) {
+HAL_StatusTypeDef AS5600_set_start_position(encoder_typedef* const handle, const uint16_t position) {
 	uint8_t data[2];
 	data[0] = (uint8_t)((position & AS5600_12_BIT_MASK) >> 8);	// zero out upper four bits of argument and shift out lower four bits
 	data[1] = (uint8_t)position;
 	return HAL_I2C_Mem_Write(handle->i2c_handle, AS5600_SHIFTED_SLAVE_ADDRESS, AS5600_REGISTER_ZPOS_HIGH, I2C_MEMADD_SIZE_8BIT, data, 2, handle->i2c_timeout);
 }
-HAL_StatusTypeDef AS5600_set_stop_position(AS5600_TypeDef* const handle, const uint16_t position) {
+HAL_StatusTypeDef AS5600_set_stop_position(encoder_typedef* const handle, const uint16_t position) {
 	uint8_t data[2];
 	data[0] = (uint8_t)((position & AS5600_12_BIT_MASK) >> 8);	// zero out upper four bits of argument and shift out lower four bits
 	data[1] = (uint8_t)position;
 	return HAL_I2C_Mem_Write(handle->i2c_handle, AS5600_SHIFTED_SLAVE_ADDRESS, AS5600_REGISTER_MPOS_HIGH, I2C_MEMADD_SIZE_8BIT, data, 2, handle->i2c_timeout);
 }
-HAL_StatusTypeDef AS5600_set_max_angle(AS5600_TypeDef* const handle, const uint16_t angle) {
+HAL_StatusTypeDef AS5600_set_max_angle(encoder_typedef* const handle, const uint16_t angle) {
 	uint8_t data[2];
 	data[0] = (uint8_t)((angle & AS5600_12_BIT_MASK) >> 8);	// zero out upper four bits of argument and shift out lower four bits
 	data[1] = (uint8_t)angle;
 	return HAL_I2C_Mem_Write(handle->i2c_handle, AS5600_SHIFTED_SLAVE_ADDRESS, AS5600_REGISTER_MANG_HIGH, I2C_MEMADD_SIZE_8BIT, data, 2, handle->i2c_timeout);
 }
-HAL_StatusTypeDef AS5600_set_positive_rotation_direction(AS5600_TypeDef* const handle, const uint8_t direction) {
+HAL_StatusTypeDef AS5600_set_positive_rotation_direction(encoder_typedef* const handle, const uint8_t direction) {
 	switch (direction) {
 	case AS5600_DIR_CW:		HAL_GPIO_WritePin(handle->dir_port, handle->dir_pin, GPIO_PIN_RESET);
 	case AS5600_DIR_CCW:	HAL_GPIO_WritePin(handle->dir_port, handle->dir_pin, GPIO_PIN_SET);
@@ -59,7 +63,7 @@ HAL_StatusTypeDef AS5600_set_positive_rotation_direction(AS5600_TypeDef* const h
 	}
 	return HAL_OK;
 }
-HAL_StatusTypeDef AS5600_set_low_power_mode(AS5600_TypeDef* const handle, const uint8_t mode) {
+HAL_StatusTypeDef AS5600_set_low_power_mode(encoder_typedef* const handle, const uint8_t mode) {
 	switch (mode) {
 	case AS5600_POWER_MODE_NOM:
 		handle->config_register[1] &= ~((1UL << 1) | (1UL << 0));
@@ -79,7 +83,7 @@ HAL_StatusTypeDef AS5600_set_low_power_mode(AS5600_TypeDef* const handle, const 
 	}
 	return HAL_OK;
 }
-HAL_StatusTypeDef AS5600_set_hysteresis(AS5600_TypeDef* const handle, const uint8_t hysteresis) {
+HAL_StatusTypeDef AS5600_set_hysteresis(encoder_typedef* const handle, const uint8_t hysteresis) {
 	switch (hysteresis) {
 	case AS5600_HYSTERESIS_OFF:
 		handle->config_register[1] &= ~((1UL << 3) | (1UL << 2));
@@ -99,7 +103,7 @@ HAL_StatusTypeDef AS5600_set_hysteresis(AS5600_TypeDef* const handle, const uint
 	}
 	return HAL_OK;
 }
-HAL_StatusTypeDef AS5600_set_output_mode(AS5600_TypeDef* const handle, const uint8_t mode, uint8_t frequency) {
+HAL_StatusTypeDef AS5600_set_output_mode(encoder_typedef* const handle, const uint8_t mode, uint8_t frequency) {
 	uint8_t pwm = 0;
 	switch (mode) {
 	case AS5600_OUTPUT_STAGE_FULL:
@@ -136,7 +140,7 @@ HAL_StatusTypeDef AS5600_set_output_mode(AS5600_TypeDef* const handle, const uin
 	}
 	return HAL_OK;
 }
-HAL_StatusTypeDef AS5600_set_slow_filter(AS5600_TypeDef* const handle, const uint8_t mode) {
+HAL_StatusTypeDef AS5600_set_slow_filter(encoder_typedef* const handle, const uint8_t mode) {
 	switch (mode) {
 	case AS5600_SLOW_FILTER_16X:
 		handle->config_register[0] &= ~((1UL << 1) | (1UL << 0));
@@ -156,7 +160,7 @@ HAL_StatusTypeDef AS5600_set_slow_filter(AS5600_TypeDef* const handle, const uin
 	}
 	return HAL_OK;
 }
-HAL_StatusTypeDef AS5600_set_fast_filter_threshold(AS5600_TypeDef* const handle, const uint8_t threshold) {
+HAL_StatusTypeDef AS5600_set_fast_filter_threshold(encoder_typedef* const handle, const uint8_t threshold) {
 	switch (threshold) {
 	case AS5600_FAST_FILTER_SLOW_ONLY:
 		handle->config_register[0] &= ~((1UL << 4) | (1UL << 3) | (1UL << 2));
@@ -192,7 +196,7 @@ HAL_StatusTypeDef AS5600_set_fast_filter_threshold(AS5600_TypeDef* const handle,
 	}
 	return HAL_OK;
 }
-HAL_StatusTypeDef AS5600_set_watchdog_timer(AS5600_TypeDef* const handle, const uint8_t mode) {
+HAL_StatusTypeDef AS5600_set_watchdog_timer(encoder_typedef* const handle, const uint8_t mode) {
 	switch (mode) {
 	case AS5600_WATCHDOG_OFF:
 		handle->config_register[0] &= ~(1UL << 6);
@@ -204,27 +208,27 @@ HAL_StatusTypeDef AS5600_set_watchdog_timer(AS5600_TypeDef* const handle, const 
 	}
 	return HAL_OK;
 }
-HAL_StatusTypeDef AS5600_write_config_register(AS5600_TypeDef* const handle) { return HAL_I2C_Mem_Write(handle->i2c_handle, AS5600_SHIFTED_SLAVE_ADDRESS, AS5600_REGISTER_CONF_HIGH, I2C_MEMADD_SIZE_8BIT, handle->config_register, 2, handle->i2c_timeout); }
+HAL_StatusTypeDef AS5600_write_config_register(encoder_typedef* const handle) { return HAL_I2C_Mem_Write(handle->i2c_handle, AS5600_SHIFTED_SLAVE_ADDRESS, AS5600_REGISTER_CONF_HIGH, I2C_MEMADD_SIZE_8BIT, handle->config_register, 2, handle->i2c_timeout); }
 /* getters */
-HAL_StatusTypeDef AS5600_get_rawAngle(AS5600_TypeDef* const handle, uint16_t* const angle) {
+HAL_StatusTypeDef as5600_get_raw_angle(encoder_typedef* const handle, uint16_t* const angle) {
 	uint8_t data[2] = {0};
 	HAL_StatusTypeDef status = HAL_I2C_Mem_Read(handle->i2c_handle, AS5600_SHIFTED_SLAVE_ADDRESS, AS5600_REGISTER_RAW_ANGLE_HIGH, I2C_MEMADD_SIZE_8BIT, data, 2, handle->i2c_timeout);
 	*angle = ((data[0] << 8) | data[1]);
 	return status;
 }
-HAL_StatusTypeDef AS5600_get_angle(AS5600_TypeDef* const handle, uint16_t* const angle) {
+HAL_StatusTypeDef as5600_get_angle(encoder_typedef* const handle, uint16_t* const angle) {
 	uint8_t data[2] = {0};
 	HAL_StatusTypeDef status = HAL_I2C_Mem_Read(handle->i2c_handle, AS5600_SHIFTED_SLAVE_ADDRESS, AS5600_REGISTER_ANGLE_HIGH, I2C_MEMADD_SIZE_8BIT, data, 2, handle->i2c_timeout);
 	*angle = ((data[0] << 8) | data[1]);
 	return status;
 }
-HAL_StatusTypeDef AS5600_get_magnet_status(AS5600_TypeDef* const handle, uint8_t* const status) {
+HAL_StatusTypeDef AS5600_get_magnet_status(encoder_typedef* const handle, uint8_t* const status) {
 	return HAL_I2C_Mem_Read(handle->i2c_handle, AS5600_SHIFTED_SLAVE_ADDRESS, AS5600_REGISTER_STATUS, I2C_MEMADD_SIZE_8BIT, status, 1, handle->i2c_timeout);
 }
-HAL_StatusTypeDef AS5600_get_AGC_setting(AS5600_TypeDef* const handle, uint8_t* const agc) {
+HAL_StatusTypeDef AS5600_get_AGC_setting(encoder_typedef* const handle, uint8_t* const agc) {
 	return HAL_I2C_Mem_Read(handle->i2c_handle, AS5600_SHIFTED_SLAVE_ADDRESS, AS5600_REGISTER_AGC, I2C_MEMADD_SIZE_8BIT, agc, 1, handle->i2c_timeout);
 }
-HAL_StatusTypeDef AS5600_get_CORDIC_magnitude(AS5600_TypeDef* const handle, uint16_t* const magnitude) {
+HAL_StatusTypeDef AS5600_get_CORDIC_magnitude(encoder_typedef* const handle, uint16_t* const magnitude) {
 	uint8_t data[2] = {0};
 	HAL_StatusTypeDef status = HAL_I2C_Mem_Read(handle->i2c_handle, AS5600_SHIFTED_SLAVE_ADDRESS, AS5600_REGISTER_ANGLE_HIGH, I2C_MEMADD_SIZE_8BIT, data, 2, handle->i2c_timeout);
 	*magnitude = ((data[0] << 8) | data[1]);

@@ -40,10 +40,8 @@ foc_gb6010\main.o: ../Core/Inc/tim.h
 foc_gb6010\main.o: ../Core/Inc/usart.h
 foc_gb6010\main.o: ../Core/Inc/gpio.h
 foc_gb6010\main.o: d:\Keil_v5\ARM\ARMCC\Bin\..\include\stdio.h
-foc_gb6010\main.o: ../Core/Inc/foc_kernal.h
-foc_gb6010\main.o: ../Core/Inc/as5600.h
-foc_gb6010\main.o: ../Core/Inc/simple_math.h
+foc_gb6010\main.o: ../Core/Inc/controll.h
 foc_gb6010\main.o: ../IQMath-master/IQmathLib.h
 foc_gb6010\main.o: d:\Keil_v5\ARM\ARMCC\Bin\..\include\limits.h
 foc_gb6010\main.o: d:\Keil_v5\ARM\ARMCC\Bin\..\include\stdlib.h
-foc_gb6010\main.o: ../Core/Inc/PID.h
+foc_gb6010\main.o: ../Core/Inc/AS5600.h

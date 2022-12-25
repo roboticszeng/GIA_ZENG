@@ -35,7 +35,6 @@ foc_gb6010\foc_kernal.o: ../Drivers/STM32F1xx_HAL_Driver/Inc/stm32f1xx_hal_tim_e
 foc_gb6010\foc_kernal.o: ../Drivers/STM32F1xx_HAL_Driver/Inc/stm32f1xx_hal_uart.h
 foc_gb6010\foc_kernal.o: d:\Keil_v5\ARM\ARMCC\Bin\..\include\math.h
 foc_gb6010\foc_kernal.o: ../Core/Inc/foc_kernal.h
-foc_gb6010\foc_kernal.o: ../Core/Inc/simple_math.h
 foc_gb6010\foc_kernal.o: ../IQMath-master/IQmathLib.h
 foc_gb6010\foc_kernal.o: d:\Keil_v5\ARM\ARMCC\Bin\..\include\limits.h
 foc_gb6010\foc_kernal.o: d:\Keil_v5\ARM\ARMCC\Bin\..\include\stdlib.h

@@ -26,14 +26,20 @@ Project File Date:  12/25/2022
 
 <h2>Output:</h2>
 Build target 'foc_gb6010'
-compiling stm32f1xx_it.c...
-../Core/Src/stm32f1xx_it.c(365): warning:  #177-D: variable "a" was declared but never referenced
-      static float a;
-../Core/Src/stm32f1xx_it.c: 1 warning, 0 errors
+compiling main.c...
+../Core/Inc/AS5600.h(134): warning:  #1-D: last line of file ends without a newline
+  #endif        /* AS5600_INCLUDED */
+../Core/Src/main.c(187): warning:  #177-D: variable "c" was declared but never referenced
+      _iq c = _IQ(0.0);
+../Core/Src/main.c(188): warning:  #177-D: variable "p_raw" was declared but never referenced
+      uint16_t p_raw, p;
+../Core/Src/main.c(189): warning:  #177-D: variable "pid_res" was declared but never referenced
+      _iq pid_res = _IQ(0.0);
+../Core/Src/main.c: 4 warnings, 0 errors
 linking...
-Program Size: Code=24232 RO-data=292 RW-data=220 ZI-data=2164  
+Program Size: Code=18022 RO-data=294 RW-data=48 ZI-data=2168  
 FromELF: creating hex file...
-"foc_gb6010\foc_gb6010.axf" - 0 Error(s), 1 Warning(s).
+"foc_gb6010\foc_gb6010.axf" - 0 Error(s), 4 Warning(s).
 
 <h2>Software Packages used:</h2>
 

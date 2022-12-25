@@ -21,8 +21,7 @@
 #include "adc.h"
 
 /* USER CODE BEGIN 0 */
-extern uint16_t actualCurA;
-extern uint16_t actualCurB;
+
 /* USER CODE END 0 */
 
 ADC_HandleTypeDef hadc1;
@@ -150,20 +149,8 @@ void HAL_ADC_MspDeInit(ADC_HandleTypeDef* adcHandle)
 }
 
 /* USER CODE BEGIN 1 */
-//void ADC_Select_Channel(uint32_t ch) {
-//    ADC_ChannelConfTypeDef conf = {
-//        .Channel = ch,
-//        .Rank = 1,
-//        .SamplingTime = ADC_SAMPLETIME_28CYCLES_5,
-//    };
-//    if (HAL_ADC_ConfigChannel(&hadc1, &conf) != HAL_OK) {
-//        Error_Handler();
-//    }
-//}
 
-
-
-uint16_t ADC_DMA_BUFF[NUMBER_ADC_CHANNEL * NUMBER_ADC_CHANNEL_AVERAGE_PER_CHANNEL]={0};
+uint16_t adc_dma_buf[NUMBER_ADC_CHANNEL * NUMBER_ADC_CHANNEL_AVERAGE_PER_CHANNEL]={0};
 
 uint16_t ADC_DMA_AVERAGE(int channel)
 {
@@ -174,7 +161,7 @@ uint16_t ADC_DMA_AVERAGE(int channel)
 	if(channel < NUMBER_ADC_CHANNEL)
 	{
 		for(i=0; i<NUMBER_ADC_CHANNEL_AVERAGE_PER_CHANNEL; i++)
-			adc_sum += ADC_DMA_BUFF[channel+i*NUMBER_ADC_CHANNEL];
+			adc_sum += adc_dma_buf[channel+i*NUMBER_ADC_CHANNEL];
 	}
 	else
 		return 1;
@@ -184,19 +171,8 @@ uint16_t ADC_DMA_AVERAGE(int channel)
 
 void ADC_get_voltage(void){
 
-    actualCurA = ADC_DMA_AVERAGE(0);
-    actualCurB = ADC_DMA_AVERAGE(1);
+//    actualCurA = ADC_DMA_AVERAGE(0);
+//    actualCurB = ADC_DMA_AVERAGE(1);
     
-//    ADC_Select_Channel(ADC_CHANNEL_0);
-////    HAL_ADC_Start(&hadc1);
-//    HAL_ADC_PollForConversion(&hadc1, 10);
-//    actualCurA = HAL_ADC_GetValue(&hadc1);
-////    HAL_ADC_Stop(&hadc1);
-//    
-//    ADC_Select_Channel(ADC_CHANNEL_1);
-////    HAL_ADC_Start(&hadc1);
-//    HAL_ADC_PollForConversion(&hadc1, 10);
-//    actualCurB = HAL_ADC_GetValue(&hadc1);
-//    HAL_ADC_Stop(&hadc1);
 }
 /* USER CODE END 1 */

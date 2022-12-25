@@ -106,29 +106,29 @@ typedef struct {	// variables are placed from largest to smallest to keep the st
 
     /* Private */
     volatile uint8_t	config_register[2];
-} AS5600_TypeDef;
+} encoder_typedef;
 
 /// AS5600 functions
 /* initialization */
-AS5600_TypeDef*		AS5600_new								(void);
-HAL_StatusTypeDef	AS5600_init								(AS5600_TypeDef* handle);
+encoder_typedef*		as5600_new								(void);
+HAL_StatusTypeDef	as5600_init								(encoder_typedef* handle);
 /* setters */
-HAL_StatusTypeDef 	AS5600_set_start_position				(AS5600_TypeDef* const handle, const uint16_t position);
-HAL_StatusTypeDef	AS5600_set_stop_position				(AS5600_TypeDef* const handle, const uint16_t position);
-HAL_StatusTypeDef	AS5600_set_max_angle					(AS5600_TypeDef* const handle, const uint16_t angle);
-HAL_StatusTypeDef	AS5600_set_positive_rotation_direction	(AS5600_TypeDef* const handle, const uint8_t direction);
-HAL_StatusTypeDef	AS5600_set_low_power_mode				(AS5600_TypeDef* const handle, const uint8_t mode);
-HAL_StatusTypeDef	AS5600_set_hysteresis					(AS5600_TypeDef* const handle, const uint8_t hysteresis);
-HAL_StatusTypeDef	AS5600_set_output_mode					(AS5600_TypeDef* const handle, const uint8_t mode, uint8_t frequency);
-HAL_StatusTypeDef	AS5600_set_slow_filter					(AS5600_TypeDef* const handle, const uint8_t mode);
-HAL_StatusTypeDef	AS5600_set_fast_filter_threshold		(AS5600_TypeDef* const handle, const uint8_t threshold);
-HAL_StatusTypeDef	AS5600_set_watchdog_timer				(AS5600_TypeDef* const handle, const uint8_t mode);
-HAL_StatusTypeDef   AS5600_write_config_register            (AS5600_TypeDef* const handle);
+HAL_StatusTypeDef 	AS5600_set_start_position				(encoder_typedef* const handle, const uint16_t position);
+HAL_StatusTypeDef	AS5600_set_stop_position				(encoder_typedef* const handle, const uint16_t position);
+HAL_StatusTypeDef	AS5600_set_max_angle					(encoder_typedef* const handle, const uint16_t angle);
+HAL_StatusTypeDef	AS5600_set_positive_rotation_direction	(encoder_typedef* const handle, const uint8_t direction);
+HAL_StatusTypeDef	AS5600_set_low_power_mode				(encoder_typedef* const handle, const uint8_t mode);
+HAL_StatusTypeDef	AS5600_set_hysteresis					(encoder_typedef* const handle, const uint8_t hysteresis);
+HAL_StatusTypeDef	AS5600_set_output_mode					(encoder_typedef* const handle, const uint8_t mode, uint8_t frequency);
+HAL_StatusTypeDef	AS5600_set_slow_filter					(encoder_typedef* const handle, const uint8_t mode);
+HAL_StatusTypeDef	AS5600_set_fast_filter_threshold		(encoder_typedef* const handle, const uint8_t threshold);
+HAL_StatusTypeDef	AS5600_set_watchdog_timer				(encoder_typedef* const handle, const uint8_t mode);
+HAL_StatusTypeDef   AS5600_write_config_register            (encoder_typedef* const handle);
 /* getters */
-HAL_StatusTypeDef	AS5600_get_rawAngle						(AS5600_TypeDef* const handle, uint16_t* const angle);
-HAL_StatusTypeDef	AS5600_get_angle						(AS5600_TypeDef* const handle, uint16_t* const angle);
-HAL_StatusTypeDef	AS5600_get_magnet_status				(AS5600_TypeDef* const handle, uint8_t* const status);
-HAL_StatusTypeDef	AS5600_get_AGC_setting					(AS5600_TypeDef* const handle, uint8_t* const agc);
-HAL_StatusTypeDef	AS5600_get_CORDIC_magnitude				(AS5600_TypeDef* const handle, uint16_t* const magnitude);
+HAL_StatusTypeDef	as5600_get_raw_angle						(encoder_typedef* const handle, uint16_t* const angle);
+HAL_StatusTypeDef	as5600_get_angle						(encoder_typedef* const handle, uint16_t* const angle);
+HAL_StatusTypeDef	AS5600_get_magnet_status				(encoder_typedef* const handle, uint8_t* const status);
+HAL_StatusTypeDef	AS5600_get_AGC_setting					(encoder_typedef* const handle, uint8_t* const agc);
+HAL_StatusTypeDef	AS5600_get_CORDIC_magnitude				(encoder_typedef* const handle, uint16_t* const magnitude);
 
 #endif	/* AS5600_INCLUDED */

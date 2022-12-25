@@ -21,7 +21,6 @@
 #include "tim.h"
 
 /* USER CODE BEGIN 0 */
-int PWM_PERIOD;
 /* USER CODE END 0 */
 
 TIM_HandleTypeDef htim1;
@@ -102,8 +101,6 @@ void MX_TIM1_Init(void)
     Error_Handler();
   }
   /* USER CODE BEGIN TIM1_Init 2 */
-
-  PWM_PERIOD = htim1.Init.Period + 1;
   
   /* USER CODE END TIM1_Init 2 */
   HAL_TIM_MspPostInit(&htim1);

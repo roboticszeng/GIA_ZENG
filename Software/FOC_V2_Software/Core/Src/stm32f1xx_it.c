@@ -23,13 +23,12 @@
 /* Private includes ----------------------------------------------------------*/
 /* USER CODE BEGIN Includes */
 
-#include "adc.h"
-#include "as5600.h"
-#include "i2c.h"
-#include "foc_kernal.h"
-#include "simple_math.h"
-#include "PID.h"
-#include "IQmathLib.h"
+//#include "adc.h"
+//#include "as5600.h"
+//#include "i2c.h"
+//#include "foc_kernal.h"
+//#include "PID.h"
+//#include "IQmathLib.h"
 
 /* USER CODE END Includes */
 
@@ -51,34 +50,6 @@
 /* Private variables ---------------------------------------------------------*/
 /* USER CODE BEGIN PV */
 
-extern AS5600_TypeDef* encoder;
-
-uint16_t targetPos;
-uint16_t targetVel;
-uint16_t targetCurQ;
-uint16_t actualPos;
-int16_t actualVel;
-uint16_t actualCurA;
-uint16_t actualCurB;
-uint16_t actualCurQ;
-uint16_t actualCurD;
-uint16_t demandPos;
-uint16_t demandVel;
-uint16_t demandCurQ;
-uint16_t limitedPos;
-uint16_t limitedVel;
-uint16_t limitedCurQ;
-
-extern float angle_elec;
-extern PIDController PID_Current_Q;
-extern PIDController PID_Velocity;
-extern PIDController PID_Position;
-
-int angle_elec_int;
-int K1 = 19;
-int K2 = -66000;
-float tempa, tempb;
-float targetQ;
 /* USER CODE END PV */
 
 /* Private function prototypes -----------------------------------------------*/
@@ -292,7 +263,7 @@ void TIM1_UP_IRQHandler(void)
   /* USER CODE BEGIN TIM1_UP_IRQn 0 */
     // TIM1 -- 电流采样 频率 XHZ
 
-    static _iq Ia, Ib, I_alpha, I_beta, I_d, I_q;
+//    static _iq Ia, Ib, I_alpha, I_beta, I_d, I_q;
     
   /* USER CODE END TIM1_UP_IRQn 0 */
   HAL_TIM_IRQHandler(&htim1);
@@ -301,30 +272,16 @@ void TIM1_UP_IRQHandler(void)
     
 //    HAL_GPIO_WritePin(GPIOC, GPIO_PIN_13, GPIO_PIN_SET);
     // 电流采样 实测时间42.5us
-    ADC_get_voltage();
-    
-//    Id = K1 * (_sin(angle_elec + _PI_3) * actualCurA + _sin(angle_elec) * actualCurB) + K2 * _sin(angle_elec + _PI_6);
-//    Iq = K1 * (_cos(angle_elec + _PI_3) * actualCurA + _cos(angle_elec) * actualCurB) + K2 * _cos(angle_elec + _PI_6);
-    
-    Ia = _IQmpy(_IQ(actualCurA), _IQ(16e-4)) - _IQ(3.3);
-    Ib = _IQmpy(_IQ(actualCurB), _IQ(16e-4)) - _IQ(3.3);
-    
-//    Ia = _IQ(actualCurA * 16e-4 - 3.3);
-//    Ib = _IQ(actualCurB * 16e-4 - 3.3);
-    
-    
-//    I_alpha = _IQ(actualCurA);
-//    I_beta = _IQmpy(_IQ(_1_SQRT3), _IQ(actualCurA)) + _IQmpy(_IQ(_2_SQRT3), _IQ(actualCurB));
-    I_alpha = Ia;
-    I_beta = _IQmpy(_IQ(_1_SQRT3), Ia) + _IQmpy(_IQ(_2_SQRT3), Ib);
-    I_d = _IQmpy(I_alpha, _IQcos(_IQ(angle_elec))) + _IQmpy(I_beta, _IQsin(_IQ(angle_elec)));
-    I_q = _IQmpy(I_beta, _IQcos(_IQ(angle_elec))) - _IQmpy(I_alpha, _IQsin(_IQ(angle_elec)));
-    
-    tempa = _IQtoF(I_d);
-    tempb = _IQtoF(I_q);
-    
-//    tempa = ((3.3*((float)actualCurA/4096))-1.65)/0.01/50;      //相电流物理值=（采样电压-偏置）/Rcs/增益  ;  单位：A
-//    tempb =((3.3*((float)actualCurB/4096))-1.65)/0.01/50;
+//    ADC_get_voltage();
+//    
+//    
+//    Ia = _IQmpy(_IQ(actualCurA), _IQ(16e-4)) - _IQ(3.3);
+//    Ib = _IQmpy(_IQ(actualCurB), _IQ(16e-4)) - _IQ(3.3);
+//    
+//    I_alpha = Ia;
+//    I_beta = _IQmpy(_IQ(_1_SQRT3), Ia) + _IQmpy(_IQ(_2_SQRT3), Ib);
+//    I_d = _IQmpy(I_alpha, _IQcos(_IQ(angle_elec))) + _IQmpy(I_beta, _IQsin(_IQ(angle_elec)));
+//    I_q = _IQmpy(I_beta, _IQcos(_IQ(angle_elec))) - _IQmpy(I_alpha, _IQsin(_IQ(angle_elec)));
     
     
 //    HAL_GPIO_WritePin(GPIOC, GPIO_PIN_13, GPIO_PIN_RESET);
@@ -338,7 +295,7 @@ void TIM1_UP_IRQHandler(void)
 void TIM2_IRQHandler(void)
 {
   /* USER CODE BEGIN TIM2_IRQn 0 */
-    static uint16_t lastPos;
+//    static uint16_t lastPos;
     // TIM2 编码器计数 频率 XHZ
 
   /* USER CODE END TIM2_IRQn 0 */
@@ -347,10 +304,10 @@ void TIM2_IRQHandler(void)
     
 //     HAL_GPIO_WritePin(GPIOC, GPIO_PIN_13, GPIO_PIN_SET);
     // 获取角度原始信息
-    lastPos = actualPos;
-    AS5600_get_rawAngle(encoder, &actualPos);
-    get_angle_elec();
-    actualVel = (actualPos - lastPos) * 1000;
+//    lastPos = actualPos;
+//    AS5600_get_rawAngle(encoder, &actualPos);
+//    get_angle_elec();
+//    actualVel = (actualPos - lastPos) * 1000;
     
 //     HAL_GPIO_WritePin(GPIOC, GPIO_PIN_13, GPIO_PIN_RESET);
   /* USER CODE END TIM2_IRQn 1 */
@@ -362,26 +319,26 @@ void TIM2_IRQHandler(void)
 void TIM3_IRQHandler(void)
 {
   /* USER CODE BEGIN TIM3_IRQn 0 */
-    static float a;
+//    static float a;
     // TIM3 电流环控制 频率 XHZ
   /* USER CODE END TIM3_IRQn 0 */
   HAL_TIM_IRQHandler(&htim3);
   /* USER CODE BEGIN TIM3_IRQn 1 */
-    HAL_GPIO_WritePin(GPIOC, GPIO_PIN_13, GPIO_PIN_SET);
+//    HAL_GPIO_WritePin(GPIOC, GPIO_PIN_13, GPIO_PIN_SET);
      
     
 //    PIDController_Update(&PID_Current_Q, 0.2, tempb / 24);
 //    setPhaseVoltage(PID_Current_Q.out, 0, angle_elec);
 //    setPhaseVoltage(0.2, 0, angle_elec);
     
-    targetQ = PIDController_Update(&PID_Velocity, 2000, actualVel);
-    setPhaseVoltage(targetQ, 0, angle_elec);
+//    targetQ = PIDController_Update(&PID_Velocity, 2000, actualVel);
+//    setPhaseVoltage(targetQ, 0, angle_elec);
     
     
 //     a = a + 0.002;
 //     setPhaseVoltage(0.1, 0, a);
     
-    HAL_GPIO_WritePin(GPIOC, GPIO_PIN_13, GPIO_PIN_RESET);
+//    HAL_GPIO_WritePin(GPIOC, GPIO_PIN_13, GPIO_PIN_RESET);
     
 //    
 
@@ -400,8 +357,8 @@ void TIM4_IRQHandler(void)
   /* USER CODE END TIM4_IRQn 0 */
   HAL_TIM_IRQHandler(&htim4);
   /* USER CODE BEGIN TIM4_IRQn 1 */
-    targetQ = PIDController_Update(&PID_Velocity, 2000, actualVel);
-    targetQ = PIDController_Update(&PID_Velocity, 2000, actualVel);
+//    targetQ = PIDController_Update(&PID_Velocity, 2000, actualVel);
+//    targetQ = PIDController_Update(&PID_Velocity, 2000, actualVel);
     
 //    HAL_GPIO_WritePin(GPIOC, GPIO_PIN_13, GPIO_PIN_RESET);
 
