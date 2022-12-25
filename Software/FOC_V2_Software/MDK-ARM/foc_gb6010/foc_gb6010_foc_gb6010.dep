@@ -38,7 +38,7 @@ I (../Core/Inc/main.h)(0x63A7F998)
 I (../Core/Inc/gpio.h)(0x63723D49)
 F (..\IQMath-master\IQmathLib.h)(0x63A7FE22)()
 F (..\IQMath-master\rvmdk-cm3\IQmathLib-cm3.lib)(0x63723D49)()
-F (../Core/Src/main.c)(0x63A81DEC)(--c99 -c --cpu Cortex-M3 -D__MICROLIB -g -O3 --apcs=interwork --split_sections -I../Core/Inc -I../Drivers/STM32F1xx_HAL_Driver/Inc -I../Drivers/STM32F1xx_HAL_Driver/Inc/Legacy -I../Drivers/CMSIS/Device/ST/STM32F1xx/Include -I../Drivers/CMSIS/Include -I../IQMath-master --c99-I D:\GitHub\GIA_ZENG\Software\FOC_V2_Software\MDK-ARM\RTE-I d:\Keil_v5\ARM\PACK\ARM\CMSIS\4.2.0\CMSIS\Include-I d:\Keil_v5\ARM\PACK\Keil\STM32F1xx_DFP\1.0.5\Device\Include-D__UVISION_VERSION="514" -D_RTE_ -DSTM32F10X_MD -DUSE_HAL_DRIVER -DSTM32F103xB-o foc_gb6010\main.o --omf_browse foc_gb6010\main.crf --depend foc_gb6010\main.d)
+F (../Core/Src/main.c)(0x63A84C95)(--c99 -c --cpu Cortex-M3 -D__MICROLIB -g -O3 --apcs=interwork --split_sections -I../Core/Inc -I../Drivers/STM32F1xx_HAL_Driver/Inc -I../Drivers/STM32F1xx_HAL_Driver/Inc/Legacy -I../Drivers/CMSIS/Device/ST/STM32F1xx/Include -I../Drivers/CMSIS/Include -I../IQMath-master --c99-I D:\GitHub\GIA_ZENG\Software\FOC_V2_Software\MDK-ARM\RTE-I d:\Keil_v5\ARM\PACK\ARM\CMSIS\4.2.0\CMSIS\Include-I d:\Keil_v5\ARM\PACK\Keil\STM32F1xx_DFP\1.0.5\Device\Include-D__UVISION_VERSION="514" -D_RTE_ -DSTM32F10X_MD -DUSE_HAL_DRIVER -DSTM32F103xB-o foc_gb6010\main.o --omf_browse foc_gb6010\main.crf --depend foc_gb6010\main.d)
 I (../Core/Inc/main.h)(0x63A7F998)
 I (../Drivers/STM32F1xx_HAL_Driver/Inc/stm32f1xx_hal.h)(0x635FCAF6)
 I (../Core/Inc/stm32f1xx_hal_conf.h)(0x63A7EC08)
@@ -72,7 +72,7 @@ I (../Drivers/STM32F1xx_HAL_Driver/Inc/stm32f1xx_hal_tim.h)(0x635FCAF6)
 I (../Drivers/STM32F1xx_HAL_Driver/Inc/stm32f1xx_hal_tim_ex.h)(0x635FCAF6)
 I (../Drivers/STM32F1xx_HAL_Driver/Inc/stm32f1xx_hal_uart.h)(0x635FCAF6)
 I (../Core/Inc/adc.h)(0x63723D49)
-I (../Core/Inc/can.h)(0x63A07156)
+I (../Core/Inc/can.h)(0x63A84350)
 I (../Core/Inc/dma.h)(0x63723D49)
 I (../Core/Inc/i2c.h)(0x63723D49)
 I (../Core/Inc/tim.h)(0x63723D49)
@@ -152,8 +152,8 @@ I (../Drivers/STM32F1xx_HAL_Driver/Inc/stm32f1xx_hal_pwr.h)(0x635FCAF6)
 I (../Drivers/STM32F1xx_HAL_Driver/Inc/stm32f1xx_hal_tim.h)(0x635FCAF6)
 I (../Drivers/STM32F1xx_HAL_Driver/Inc/stm32f1xx_hal_tim_ex.h)(0x635FCAF6)
 I (../Drivers/STM32F1xx_HAL_Driver/Inc/stm32f1xx_hal_uart.h)(0x635FCAF6)
-F (../Core/Src/can.c)(0x63A07156)(--c99 -c --cpu Cortex-M3 -D__MICROLIB -g -O3 --apcs=interwork --split_sections -I../Core/Inc -I../Drivers/STM32F1xx_HAL_Driver/Inc -I../Drivers/STM32F1xx_HAL_Driver/Inc/Legacy -I../Drivers/CMSIS/Device/ST/STM32F1xx/Include -I../Drivers/CMSIS/Include -I../IQMath-master --c99-I D:\GitHub\GIA_ZENG\Software\FOC_V2_Software\MDK-ARM\RTE-I d:\Keil_v5\ARM\PACK\ARM\CMSIS\4.2.0\CMSIS\Include-I d:\Keil_v5\ARM\PACK\Keil\STM32F1xx_DFP\1.0.5\Device\Include-D__UVISION_VERSION="514" -D_RTE_ -DSTM32F10X_MD -DUSE_HAL_DRIVER -DSTM32F103xB-o foc_gb6010\can.o --omf_browse foc_gb6010\can.crf --depend foc_gb6010\can.d)
-I (../Core/Inc/can.h)(0x63A07156)
+F (../Core/Src/can.c)(0x63A86714)(--c99 -c --cpu Cortex-M3 -D__MICROLIB -g -O3 --apcs=interwork --split_sections -I../Core/Inc -I../Drivers/STM32F1xx_HAL_Driver/Inc -I../Drivers/STM32F1xx_HAL_Driver/Inc/Legacy -I../Drivers/CMSIS/Device/ST/STM32F1xx/Include -I../Drivers/CMSIS/Include -I../IQMath-master --c99-I D:\GitHub\GIA_ZENG\Software\FOC_V2_Software\MDK-ARM\RTE-I d:\Keil_v5\ARM\PACK\ARM\CMSIS\4.2.0\CMSIS\Include-I d:\Keil_v5\ARM\PACK\Keil\STM32F1xx_DFP\1.0.5\Device\Include-D__UVISION_VERSION="514" -D_RTE_ -DSTM32F10X_MD -DUSE_HAL_DRIVER -DSTM32F103xB-o foc_gb6010\can.o --omf_browse foc_gb6010\can.crf --depend foc_gb6010\can.d)
+I (../Core/Inc/can.h)(0x63A84350)
 I (../Core/Inc/main.h)(0x63A7F998)
 I (../Drivers/STM32F1xx_HAL_Driver/Inc/stm32f1xx_hal.h)(0x635FCAF6)
 I (../Core/Inc/stm32f1xx_hal_conf.h)(0x63A7EC08)
@@ -186,6 +186,11 @@ I (../Drivers/STM32F1xx_HAL_Driver/Inc/stm32f1xx_hal_pwr.h)(0x635FCAF6)
 I (../Drivers/STM32F1xx_HAL_Driver/Inc/stm32f1xx_hal_tim.h)(0x635FCAF6)
 I (../Drivers/STM32F1xx_HAL_Driver/Inc/stm32f1xx_hal_tim_ex.h)(0x635FCAF6)
 I (../Drivers/STM32F1xx_HAL_Driver/Inc/stm32f1xx_hal_uart.h)(0x635FCAF6)
+I (../Core/Inc/as5600.h)(0x63A801D2)
+I (../Core/Inc/controll.h)(0x63A81C55)
+I (../IQMath-master/IQmathLib.h)(0x63A7FE22)
+I (d:\Keil_v5\ARM\ARMCC\include\limits.h)(0x5475F2FA)
+I (d:\Keil_v5\ARM\ARMCC\include\stdlib.h)(0x5475F300)
 F (../Core/Src/i2c.c)(0x63723D49)(--c99 -c --cpu Cortex-M3 -D__MICROLIB -g -O3 --apcs=interwork --split_sections -I../Core/Inc -I../Drivers/STM32F1xx_HAL_Driver/Inc -I../Drivers/STM32F1xx_HAL_Driver/Inc/Legacy -I../Drivers/CMSIS/Device/ST/STM32F1xx/Include -I../Drivers/CMSIS/Include -I../IQMath-master --c99-I D:\GitHub\GIA_ZENG\Software\FOC_V2_Software\MDK-ARM\RTE-I d:\Keil_v5\ARM\PACK\ARM\CMSIS\4.2.0\CMSIS\Include-I d:\Keil_v5\ARM\PACK\Keil\STM32F1xx_DFP\1.0.5\Device\Include-D__UVISION_VERSION="514" -D_RTE_ -DSTM32F10X_MD -DUSE_HAL_DRIVER -DSTM32F103xB-o foc_gb6010\i2c.o --omf_browse foc_gb6010\i2c.crf --depend foc_gb6010\i2c.d)
 I (../Core/Inc/i2c.h)(0x63723D49)
 I (../Core/Inc/main.h)(0x63A7F998)
@@ -322,7 +327,7 @@ I (../Drivers/STM32F1xx_HAL_Driver/Inc/stm32f1xx_hal_pwr.h)(0x635FCAF6)
 I (../Drivers/STM32F1xx_HAL_Driver/Inc/stm32f1xx_hal_tim.h)(0x635FCAF6)
 I (../Drivers/STM32F1xx_HAL_Driver/Inc/stm32f1xx_hal_tim_ex.h)(0x635FCAF6)
 I (../Drivers/STM32F1xx_HAL_Driver/Inc/stm32f1xx_hal_uart.h)(0x635FCAF6)
-F (../Core/Src/stm32f1xx_it.c)(0x63A7F539)(--c99 -c --cpu Cortex-M3 -D__MICROLIB -g -O3 --apcs=interwork --split_sections -I../Core/Inc -I../Drivers/STM32F1xx_HAL_Driver/Inc -I../Drivers/STM32F1xx_HAL_Driver/Inc/Legacy -I../Drivers/CMSIS/Device/ST/STM32F1xx/Include -I../Drivers/CMSIS/Include -I../IQMath-master --c99-I D:\GitHub\GIA_ZENG\Software\FOC_V2_Software\MDK-ARM\RTE-I d:\Keil_v5\ARM\PACK\ARM\CMSIS\4.2.0\CMSIS\Include-I d:\Keil_v5\ARM\PACK\Keil\STM32F1xx_DFP\1.0.5\Device\Include-D__UVISION_VERSION="514" -D_RTE_ -DSTM32F10X_MD -DUSE_HAL_DRIVER -DSTM32F103xB-o foc_gb6010\stm32f1xx_it.o --omf_browse foc_gb6010\stm32f1xx_it.crf --depend foc_gb6010\stm32f1xx_it.d)
+F (../Core/Src/stm32f1xx_it.c)(0x63A84FA5)(--c99 -c --cpu Cortex-M3 -D__MICROLIB -g -O3 --apcs=interwork --split_sections -I../Core/Inc -I../Drivers/STM32F1xx_HAL_Driver/Inc -I../Drivers/STM32F1xx_HAL_Driver/Inc/Legacy -I../Drivers/CMSIS/Device/ST/STM32F1xx/Include -I../Drivers/CMSIS/Include -I../IQMath-master --c99-I D:\GitHub\GIA_ZENG\Software\FOC_V2_Software\MDK-ARM\RTE-I d:\Keil_v5\ARM\PACK\ARM\CMSIS\4.2.0\CMSIS\Include-I d:\Keil_v5\ARM\PACK\Keil\STM32F1xx_DFP\1.0.5\Device\Include-D__UVISION_VERSION="514" -D_RTE_ -DSTM32F10X_MD -DUSE_HAL_DRIVER -DSTM32F103xB-o foc_gb6010\stm32f1xx_it.o --omf_browse foc_gb6010\stm32f1xx_it.crf --depend foc_gb6010\stm32f1xx_it.d)
 I (../Core/Inc/main.h)(0x63A7F998)
 I (../Drivers/STM32F1xx_HAL_Driver/Inc/stm32f1xx_hal.h)(0x635FCAF6)
 I (../Core/Inc/stm32f1xx_hal_conf.h)(0x63A7EC08)
@@ -356,6 +361,11 @@ I (../Drivers/STM32F1xx_HAL_Driver/Inc/stm32f1xx_hal_tim.h)(0x635FCAF6)
 I (../Drivers/STM32F1xx_HAL_Driver/Inc/stm32f1xx_hal_tim_ex.h)(0x635FCAF6)
 I (../Drivers/STM32F1xx_HAL_Driver/Inc/stm32f1xx_hal_uart.h)(0x635FCAF6)
 I (../Core/Inc/stm32f1xx_it.h)(0x63A07157)
+I (../Core/Inc/controll.h)(0x63A81C55)
+I (../IQMath-master/IQmathLib.h)(0x63A7FE22)
+I (d:\Keil_v5\ARM\ARMCC\include\limits.h)(0x5475F2FA)
+I (d:\Keil_v5\ARM\ARMCC\include\stdlib.h)(0x5475F300)
+I (../Core/Inc/as5600.h)(0x63A801D2)
 F (../Core/Src/stm32f1xx_hal_msp.c)(0x63723D49)(--c99 -c --cpu Cortex-M3 -D__MICROLIB -g -O3 --apcs=interwork --split_sections -I../Core/Inc -I../Drivers/STM32F1xx_HAL_Driver/Inc -I../Drivers/STM32F1xx_HAL_Driver/Inc/Legacy -I../Drivers/CMSIS/Device/ST/STM32F1xx/Include -I../Drivers/CMSIS/Include -I../IQMath-master --c99-I D:\GitHub\GIA_ZENG\Software\FOC_V2_Software\MDK-ARM\RTE-I d:\Keil_v5\ARM\PACK\ARM\CMSIS\4.2.0\CMSIS\Include-I d:\Keil_v5\ARM\PACK\Keil\STM32F1xx_DFP\1.0.5\Device\Include-D__UVISION_VERSION="514" -D_RTE_ -DSTM32F10X_MD -DUSE_HAL_DRIVER -DSTM32F103xB-o foc_gb6010\stm32f1xx_hal_msp.o --omf_browse foc_gb6010\stm32f1xx_hal_msp.crf --depend foc_gb6010\stm32f1xx_hal_msp.d)
 I (../Core/Inc/main.h)(0x63A7F998)
 I (../Drivers/STM32F1xx_HAL_Driver/Inc/stm32f1xx_hal.h)(0x635FCAF6)

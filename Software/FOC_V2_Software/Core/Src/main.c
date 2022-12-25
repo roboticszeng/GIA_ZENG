@@ -77,7 +77,14 @@ void SystemClock_Config(void);
 
 /* Private user code ---------------------------------------------------------*/
 /* USER CODE BEGIN 0 */
-/* Controller parameters */
+
+// can test
+CAN_TxHeaderTypeDef Can_Tx;
+CAN_RxHeaderTypeDef Can_Rx;
+uint8_t Rxdata[8];//CAN接收缓冲区
+uint8_t Txdata[8] = {0};//CAN发送缓冲区
+extern uint8_t can_rx_finish_flag;//接收完成标志位
+
 
 extern uint16_t adc_dma_buf[NUMBER_ADC_CHANNEL * NUMBER_ADC_CHANNEL_AVERAGE_PER_CHANNEL];
 
@@ -179,6 +186,8 @@ int main(void)
     pdo_init(oPdo);
     filter_init(oFilterVelocity, 2.0, 0.1);
     
+    CAN_User_Init(&hcan);
+    
     HAL_Delay(2000);
     
     
@@ -200,8 +209,16 @@ int main(void)
 //      compute_svpwm(_IQ(0.5), _IQ(0.0), oPdo->angle_elec);
       angle_filt = filter_update(oFilterVelocity, oPdo->angle);
 
-      printf("%.3f, %.3f", _IQtoF(oPdo->angle), _IQtoF(angle_filt));
+      printf("%.3f, %.3f, ", _IQtoF(oPdo->angle), _IQtoF(oPdo->angle_elec));
+      printf("%.3f", _IQtoF(oPidVelocity->Kp));
       printf("\r\n");
+      
+    if(can_rx_finish_flag==1)//接收完成
+    {
+        sendmessage(0x123,0x14550151,CAN_ID_EXT,0,8,26.2);
+        can_rx_finish_flag=0;
+        HAL_GPIO_TogglePin(LED_GPIO_Port, LED_Pin);
+    }
       
       HAL_Delay(100);
     /* USER CODE END WHILE */

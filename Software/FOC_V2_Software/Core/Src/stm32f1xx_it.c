@@ -23,12 +23,8 @@
 /* Private includes ----------------------------------------------------------*/
 /* USER CODE BEGIN Includes */
 
-//#include "adc.h"
-//#include "as5600.h"
-//#include "i2c.h"
-//#include "foc_kernal.h"
-//#include "PID.h"
-//#include "IQmathLib.h"
+#include "controll.h"
+#include "as5600.h"
 
 /* USER CODE END Includes */
 
@@ -71,7 +67,16 @@ extern TIM_HandleTypeDef htim3;
 extern TIM_HandleTypeDef htim4;
 /* USER CODE BEGIN EV */
 
+extern CAN_RxHeaderTypeDef Can_Rx;
+extern uint8_t Rxdata[8] ;
+extern float rxdata;
+uint8_t can_rx_finish_flag;//接收完成标志位
 
+extern pid_typedef* oPidVelocity;
+extern encoder_typedef* oEncoder;
+extern sdo_typedef* oConfig;
+extern pdo_typedef* oPdo;
+extern filter_typedef* oFilterVelocity;
 
 /* USER CODE END EV */
 
@@ -251,7 +256,7 @@ void USB_LP_CAN1_RX0_IRQHandler(void)
   /* USER CODE END USB_LP_CAN1_RX0_IRQn 0 */
   HAL_CAN_IRQHandler(&hcan);
   /* USER CODE BEGIN USB_LP_CAN1_RX0_IRQn 1 */
-
+    
   /* USER CODE END USB_LP_CAN1_RX0_IRQn 1 */
 }
 
@@ -366,5 +371,26 @@ void TIM4_IRQHandler(void)
 }
 
 /* USER CODE BEGIN 1 */
-
+void HAL_CAN_RxFifo0MsgPendingCallback(CAN_HandleTypeDef* hcan1)
+{
+	uint8_t i;
+//	printf("***********************************************\r\n");
+	HAL_CAN_GetRxMessage(&hcan,CAN_RX_FIFO0,&Can_Rx,Rxdata);
+    can_rx_finish_flag=1;
+    
+    switch (Can_Rx.ExtId){
+        case 0x3507:
+        oPidVelocity->Kp = _IQ(Rxdata[0]);
+        break;
+        case 0x4507:
+        oPidVelocity->Kp = _IQ(Rxdata[0]);
+        break;
+    }
+    
+    
+    
+    
+//     printf("RX ID:0x%X\r\n",Can_Rx.ExtId);
+//	 printf("RX DATA: %02X%02X%02X%02X%02X%02X%02X%02X\r\n",Rxdata[0],Rxdata[1],Rxdata[2],Rxdata[3],Rxdata[4],Rxdata[5],Rxdata[6],Rxdata[7]);
+}
 /* USER CODE END 1 */

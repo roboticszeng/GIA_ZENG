@@ -26,20 +26,18 @@ Project File Date:  12/25/2022
 
 <h2>Output:</h2>
 Build target 'foc_gb6010'
-compiling main.c...
-../Core/Inc/AS5600.h(134): warning:  #1-D: last line of file ends without a newline
+compiling can.c...
+../Core/Inc/as5600.h(134): warning:  #1-D: last line of file ends without a newline
   #endif        /* AS5600_INCLUDED */
-../Core/Src/main.c(187): warning:  #177-D: variable "c" was declared but never referenced
-      _iq c = _IQ(0.0);
-../Core/Src/main.c(188): warning:  #177-D: variable "p_raw" was declared but never referenced
-      uint16_t p_raw, p;
-../Core/Src/main.c(189): warning:  #177-D: variable "pid_res" was declared but never referenced
-      _iq pid_res = _IQ(0.0);
-../Core/Src/main.c: 4 warnings, 0 errors
+../Core/Src/can.c(43): warning:  #177-D: variable "mask" was declared but never referenced
+      int mask;
+../Core/Src/can.c(100): warning:  #177-D: variable "i" was declared but never referenced
+        uint8_t i;
+../Core/Src/can.c: 3 warnings, 0 errors
 linking...
-Program Size: Code=18022 RO-data=294 RW-data=48 ZI-data=2168  
+Program Size: Code=19164 RO-data=292 RW-data=72 ZI-data=2216  
 FromELF: creating hex file...
-"foc_gb6010\foc_gb6010.axf" - 0 Error(s), 4 Warning(s).
+"foc_gb6010\foc_gb6010.axf" - 0 Error(s), 3 Warning(s).
 
 <h2>Software Packages used:</h2>
 
