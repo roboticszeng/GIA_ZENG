@@ -5,6 +5,7 @@
 /// includes
 #include <stdint.h>
 #include "stm32f1xx_hal.h"
+#include "controll.h"
 
 /// AS5600 address
 #define AS5600_SLAVE_ADDRESS			0x36
@@ -126,9 +127,10 @@ HAL_StatusTypeDef	AS5600_set_watchdog_timer				(encoder_typedef* const handle, c
 HAL_StatusTypeDef   AS5600_write_config_register            (encoder_typedef* const handle);
 /* getters */
 HAL_StatusTypeDef	as5600_get_raw_angle						(encoder_typedef* const handle, uint16_t* const angle);
-HAL_StatusTypeDef	as5600_get_angle						(encoder_typedef* const handle, uint16_t* const angle);
+HAL_StatusTypeDef as5600_get_angle(encoder_typedef* const enc_handle, pdo_typedef* pdo_handle);
 HAL_StatusTypeDef	AS5600_get_magnet_status				(encoder_typedef* const handle, uint8_t* const status);
 HAL_StatusTypeDef	AS5600_get_AGC_setting					(encoder_typedef* const handle, uint8_t* const agc);
 HAL_StatusTypeDef	AS5600_get_CORDIC_magnitude				(encoder_typedef* const handle, uint16_t* const magnitude);
+
 
 #endif	/* AS5600_INCLUDED */

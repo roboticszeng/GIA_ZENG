@@ -204,12 +204,9 @@ int main(void)
   while (1)
   {
       
-      as5600_get_raw_angle(oEncoder, &p);
-      get_angle_elec(p, oPdo);
-//      compute_svpwm(_IQ(0.5), _IQ(0.0), oPdo->angle_elec);
-      angle_filt = filter_update(oFilterVelocity, oPdo->angle);
+      as5600_get_angle(oEncoder, oPdo);
 
-      printf("%.3f, %.3f, ", _IQtoF(oPdo->angle), _IQtoF(oPdo->angle_elec));
+      printf("%.3f, %.3f, ", _IQtoF(oPdo->iqPos), _IQtoF(oPdo->iqPosElec));
       printf("%.3f", _IQtoF(oPidVelocity->Kp));
       printf("\r\n");
       

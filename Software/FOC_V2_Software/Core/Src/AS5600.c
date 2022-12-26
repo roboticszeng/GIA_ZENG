@@ -216,12 +216,25 @@ HAL_StatusTypeDef as5600_get_raw_angle(encoder_typedef* const handle, uint16_t* 
 	*angle = ((data[0] << 8) | data[1]);
 	return status;
 }
-HAL_StatusTypeDef as5600_get_angle(encoder_typedef* const handle, uint16_t* const angle) {
+
+extern sdo_typedef* oConfig;
+extern filter_typedef* oFilterVelocity;
+HAL_StatusTypeDef as5600_get_angle(encoder_typedef* const enc_handle, pdo_typedef* pdo_handle) {
 	uint8_t data[2] = {0};
-	HAL_StatusTypeDef status = HAL_I2C_Mem_Read(handle->i2c_handle, AS5600_SHIFTED_SLAVE_ADDRESS, AS5600_REGISTER_ANGLE_HIGH, I2C_MEMADD_SIZE_8BIT, data, 2, handle->i2c_timeout);
-	*angle = ((data[0] << 8) | data[1]);
+	HAL_StatusTypeDef status = HAL_I2C_Mem_Read(enc_handle->i2c_handle, AS5600_SHIFTED_SLAVE_ADDRESS, AS5600_REGISTER_ANGLE_HIGH, I2C_MEMADD_SIZE_8BIT, data, 2, enc_handle->i2c_timeout);
+	pdo_handle->actual_position = ((data[0] << 8) | data[1]);
+    
+    pdo_handle->iqPos = convert_pulse_to_position(pdo_handle->actual_position);
+    pdo_handle->iqPosElec = compute_position_elec(pdo_handle->iqPos);
+    pdo_handle->iqVel = _IQdiv((pdo_handle->iqPos - pdo_handle->iqPosPrev), oConfig->CONST_POSITION_SAMP_TIME);
+    pdo_handle->iqVel = filter_update(oFilterVelocity, pdo_handle->iqVel);
+    
+    pdo_handle->iqPosPrev = pdo_handle->iqPos;
 	return status;
 }
+
+
+
 HAL_StatusTypeDef AS5600_get_magnet_status(encoder_typedef* const handle, uint8_t* const status) {
 	return HAL_I2C_Mem_Read(handle->i2c_handle, AS5600_SHIFTED_SLAVE_ADDRESS, AS5600_REGISTER_STATUS, I2C_MEMADD_SIZE_8BIT, status, 1, handle->i2c_timeout);
 }

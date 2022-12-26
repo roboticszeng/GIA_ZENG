@@ -87,11 +87,6 @@ extern "C"
 #define _2PI 6.28318530718
 #define _3PI_2 4.71238898038
 #define _PI_6 0.52359877559
-
-#define BIT_16 65536
-#define BIT_15 32768
-
-
 #define Q30                     30
 #define Q29                     29
 #define Q28                     28

@@ -70,12 +70,53 @@ typedef struct{
     _iq CONST_ENC_RESOLUTION;
     _iq CONST_POLAR_PAIRS;
     _iq CONST_ZERO_POSITION;
+    
+    _iq CONST_ADC_RESOLUTION;
+    _iq CONST_MCU_VOLTAGE;
+    _iq CONST_CUR_SAMP_GAIN;
+    _iq CONST_CUR_SAMP_RESISTANCE;
+    
+    _iq CONST_PULSE_TO_CUR_SLOPE;
+    _iq CONST_PULSE_TO_CUR_OFFSET;
+    _iq CONST_CUR_TO_PULSE_SLOPE;
+    _iq CONST_CUR_TO_PULSE_OFFSET;
+    
+    _iq CONST_POSITION_SAMP_TIME;
+    
+    
 } sdo_typedef;
 
 typedef struct{
     
-    _iq angle;
-    _iq angle_elec;
+    _iq iqPos;
+    _iq iqPosElec;
+    _iq iqVel;
+    _iq iqCurA;
+    _iq iqCurB;
+    _iq iqCurQ;
+    _iq iqCurD;
+    
+    _iq iqPosPrev;
+    
+    
+    
+    
+    
+    
+    
+    
+    uint16_t actual_position;
+    uint16_t actual_velocity;
+    uint16_t actual_current_q;
+    uint16_t actual_current_d;
+    uint16_t following_error;
+    uint16_t mode;
+    
+    uint16_t target_position;
+    uint16_t target_velocity;
+    uint16_t target_current_q;
+    
+    
     
 } pdo_typedef;
 
@@ -94,7 +135,20 @@ void pdo_init(pdo_typedef* handle);
 _iq pid_update(pid_typedef* handle, _iq setpoint, _iq measurement);
 _iq filter_update(filter_typedef* handle, _iq input);
 void compute_svpwm(_iq Uq, _iq Ud, _iq angle_elec);
-void get_angle_elec(uint16_t pos_enc, pdo_typedef *handle);
+uint16_t compute_following_error(pdo_typedef* handle);
+_iq compute_position_elec(_iq pos);
+
+
+// µ¥Î»×ª»»
+_iq convert_pulse_to_position(uint16_t actual_position);
+_iq convert_pulse_to_velocity(uint16_t actual_velocity);
+_iq convert_pulse_to_current(uint16_t actual_current);
+
+uint16_t convert_position_to_pulse(_iq pos);
+uint16_t convert_velocity_to_pulse(_iq vel);
+uint16_t convert_current_to_pulse(_iq cur);
+
+
 
 
 

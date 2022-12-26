@@ -5,11 +5,11 @@
 <h2>Tool Versions:</h2>
 IDE-Version: ¦ÌVision V5.14.0.0
 Copyright (C) 2015 ARM Ltd and ARM Germany GmbH. All rights reserved.
-License Information: s RoboticsZeng, s, LIC=BL263-AGXV8-PG17L-0QNJQ-DAANJ-R8D6A
+License Information: a zengyuhao, a, LIC=CRMZ9-44ENH-79QG1-CJH85-CYLSR-B9VXB
  
 Tool Versions:
 Toolchain:       MDK-ARM Professional  Version: 5.14.0.0
-Toolchain Path:  d:\Keil_v5\ARM\ARMCC\Bin
+Toolchain Path:  C:\Keil_v5\ARM\ARMCC\Bin
 C Compiler:      Armcc.exe V5.05 update 1 (build 106)
 Assembler:       Armasm.exe V5.05 update 1 (build 106)
 Linker/Locator:  ArmLink.exe V5.05 update 1 (build 106)
@@ -21,23 +21,55 @@ Target DLL:      STLink\ST-LINKIII-KEIL_SWO.dll V2.0.14.0_KEIL
 Dialog DLL:      TCM.DLL V1.14.4.0
  
 <h2>Project:</h2>
-D:\GitHub\GIA_ZENG\Software\FOC_V2_Software\MDK-ARM\foc_gb6010.uvprojx
-Project File Date:  12/25/2022
+C:\Git\Github\GIA_ZENG\Software\FOC_V2_Software\MDK-ARM\foc_gb6010.uvprojx
+Project File Date:  12/26/2022
 
 <h2>Output:</h2>
 Build target 'foc_gb6010'
+compiling AS5600.c...
+../Core/Inc/as5600.h(136): warning:  #1-D: last line of file ends without a newline
+  #endif        /* AS5600_INCLUDED */
+..\Core\Src\AS5600.c(64): warning:  #111-D: statement is unreachable
+        return HAL_OK;
+..\Core\Src\AS5600.c(211): warning:  #167-D: argument of type "volatile uint8_t *" is incompatible with parameter of type "uint8_t *"
+  HAL_StatusTypeDef AS5600_write_config_register(encoder_typedef* const handle) { return HAL_I2C_Mem_Write(handle->i2c_handle, AS5600_SHIFTED_SLAVE_ADDRESS, AS5600_REGISTER_CONF_HIGH, I2C_MEMADD_SIZE_8BIT, handle->config_register, 2, handle->i2c_timeout); }
+..\Core\Src\AS5600.c(252): warning:  #1-D: last line of file ends without a newline
+  }
+..\Core\Src\AS5600.c: 4 warnings, 0 errors
+compiling main.c...
+../Core/Inc/AS5600.h(136): warning:  #1-D: last line of file ends without a newline
+  #endif        /* AS5600_INCLUDED */
+../Core/Src/main.c(208): warning:  #223-D: function "get_angle_elec" declared implicitly
+        get_angle_elec(p, oPdo);
+../Core/Src/main.c(196): warning:  #177-D: variable "c" was declared but never referenced
+      _iq c = _IQ(0.0);
+../Core/Src/main.c(197): warning:  #177-D: variable "p_raw" was declared but never referenced
+      uint16_t p_raw, p;
+../Core/Src/main.c(198): warning:  #177-D: variable "pid_res" was declared but never referenced
+      _iq pid_res = _IQ(0.0);
+../Core/Src/main.c(199): warning:  #550-D: variable "angle_filt" was set but never used
+      _iq angle_filt;
+../Core/Src/main.c: 6 warnings, 0 errors
 compiling can.c...
-../Core/Inc/as5600.h(134): warning:  #1-D: last line of file ends without a newline
+../Core/Inc/as5600.h(136): warning:  #1-D: last line of file ends without a newline
   #endif        /* AS5600_INCLUDED */
 ../Core/Src/can.c(43): warning:  #177-D: variable "mask" was declared but never referenced
       int mask;
 ../Core/Src/can.c(100): warning:  #177-D: variable "i" was declared but never referenced
         uint8_t i;
 ../Core/Src/can.c: 3 warnings, 0 errors
+compiling stm32f1xx_it.c...
+../Core/Inc/as5600.h(136): warning:  #1-D: last line of file ends without a newline
+  #endif        /* AS5600_INCLUDED */
+../Core/Src/stm32f1xx_it.c(376): warning:  #177-D: variable "i" was declared but never referenced
+        uint8_t i;
+../Core/Src/stm32f1xx_it.c: 2 warnings, 0 errors
+compiling controll.c...
 linking...
-Program Size: Code=19164 RO-data=292 RW-data=72 ZI-data=2216  
-FromELF: creating hex file...
-"foc_gb6010\foc_gb6010.axf" - 0 Error(s), 3 Warning(s).
+foc_gb6010\foc_gb6010.axf: Error: L6218E: Undefined symbol get_angle_elec (referred from main.o).
+Not enough information to list image symbols.
+Finished: 1 information, 0 warning and 1 error messages.
+"foc_gb6010\foc_gb6010.axf" - 1 Error(s), 15 Warning(s).
 
 <h2>Software Packages used:</h2>
 
@@ -48,14 +80,15 @@ Package Vendor: ARM
    * Component: CORE Version: 3.40.0
 
 <h2>Collection of Component include folders:</h2>
-  D:\GitHub\GIA_ZENG\Software\FOC_V2_Software\MDK-ARM\RTE
-  d:\Keil_v5\ARM\PACK\ARM\CMSIS\4.2.0\CMSIS\Include
-  d:\Keil_v5\ARM\PACK\Keil\STM32F1xx_DFP\1.0.5\Device\Include
+  C:\Git\Github\GIA_ZENG\Software\FOC_V2_Software\MDK-ARM\RTE
+  C:\Keil_v5\ARM\PACK\ARM\CMSIS\4.2.0\CMSIS\Include
+  C:\Keil_v5\ARM\PACK\Keil\STM32F1xx_DFP\1.0.5\Device\Include
 
 <h2>Collection of Component Files used:</h2>
 
    * Component: ARM::CMSIS:CORE:3.40.0
       Source file:   CMSIS\UserCodeTemplates\ARM\ITM_Retarget.c
+Target not created.
 </pre>
 </body>
 </html>

@@ -32,6 +32,11 @@ extern "C" {
 /* Private includes ----------------------------------------------------------*/
 /* USER CODE BEGIN Includes */
 
+#define MODE_CSP 0x08
+#define MODE_CSV 0x09
+#define MODE_CST 0x0a
+    
+    
 /* USER CODE END Includes */
 
 /* Exported types ------------------------------------------------------------*/

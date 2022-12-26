@@ -87,6 +87,7 @@ void filter_init(filter_typedef* handle, float freq, float sample_time){
     handle->output[1] = _IQ(0.0);
     
 }
+
 _iq filter_update(filter_typedef* handle, _iq input){
     
     handle->output[1] = handle->output[0];
@@ -113,10 +114,27 @@ sdo_typedef* config_new(void) {
 }
 
 void config_init(sdo_typedef *handle){
-    handle->CONST_PWM_PERIOD = _IQ(__HAL_TIM_GET_AUTORELOAD(&htim1));
+    handle->CONST_PWM_PERIOD = _IQ(__HAL_TIM_GET_AUTORELOAD(&htim1) + 1);
+    // check 怎么get prescaler?
+    handle->CONST_POSITION_SAMP_TIME = _IQ(1e-3);
     handle->CONST_ENC_RESOLUTION = _IQ(4096);
     handle->CONST_POLAR_PAIRS = _IQ(14);
     handle->CONST_ZERO_POSITION = _IQ(0);
+    
+    handle->CONST_ADC_RESOLUTION = _IQ(4096);
+    handle->CONST_MCU_VOLTAGE = _IQ(3.3);
+    handle->CONST_CUR_SAMP_GAIN = _IQ(50);
+    handle->CONST_CUR_SAMP_RESISTANCE = _IQ(0.01);
+    
+    handle->CONST_PULSE_TO_CUR_SLOPE = _IQdiv(handle->CONST_MCU_VOLTAGE, \
+        _IQmpy(_IQmpy(handle->CONST_CUR_SAMP_GAIN, handle->CONST_CUR_SAMP_RESISTANCE), handle->CONST_ADC_RESOLUTION));
+    handle->CONST_PULSE_TO_CUR_OFFSET = _IQdiv(-handle->CONST_MCU_VOLTAGE, \
+        _IQmpy(_IQmpy(handle->CONST_CUR_SAMP_GAIN, handle->CONST_CUR_SAMP_RESISTANCE), _IQ(2.0)));
+    
+    handle->CONST_CUR_TO_PULSE_SLOPE = _IQdiv(_IQmpy(_IQmpy(handle->CONST_CUR_SAMP_GAIN, handle->CONST_CUR_SAMP_RESISTANCE), handle->CONST_ADC_RESOLUTION), \
+        handle->CONST_MCU_VOLTAGE);
+    handle->CONST_CUR_TO_PULSE_OFFSET = _IQdiv(handle->CONST_ADC_RESOLUTION, _IQ(2));
+    
 }
 
 pdo_typedef* pdo_new(void) { 
@@ -125,8 +143,8 @@ pdo_typedef* pdo_new(void) {
 }
 
 void pdo_init(pdo_typedef *handle){
-    handle->angle = _IQ(0.0);
-    handle->angle_elec = _IQ(0.0);
+    handle->iqPos = _IQ(0.0);
+    handle->iqPosElec = _IQ(0.0);
 }
 
 
@@ -223,11 +241,58 @@ void compute_svpwm(_iq Uq, _iq Ud, _iq angle_elec)
 
 }
 
-void get_angle_elec(uint16_t pos_enc, pdo_typedef *handle){
-    handle->angle = _IQdiv(_IQmpy(_IQ(pos_enc) - oConfig->CONST_ZERO_POSITION, _IQ(_2PI)), oConfig->CONST_ENC_RESOLUTION);
-    handle->angle_elec = _IQmpy(handle->angle, oConfig->CONST_POLAR_PAIRS);
-}
-
-
 /*** foc ***/
 /***********************************************************************************************************************************************/
+
+
+uint16_t compute_following_error(pdo_typedef* handle){
+    switch (handle->mode){
+        case MODE_CSP:
+        handle->following_error = handle->target_position - handle->actual_position + BIT_15;
+        
+        break;
+        case MODE_CSV:
+        handle->following_error = handle->target_velocity - handle->actual_position + BIT_15;
+        
+        break;
+        case MODE_CST:
+        handle->following_error = handle->target_current_q - handle->actual_current_q + BIT_15;
+        
+        break;
+        otherwise:
+        handle->following_error = 0;
+        break;
+    
+    return handle->following_error;
+    }
+    
+}
+
+_iq compute_position_elec(_iq pos){
+    return _IQmpy(pos, oConfig->CONST_POLAR_PAIRS);
+}
+
+_iq convert_pulse_to_position(uint16_t actual_position){
+    return _IQdiv(_IQmpy(_IQ(actual_position) - oConfig->CONST_ZERO_POSITION, _IQ(_2PI)), oConfig->CONST_ENC_RESOLUTION);
+}
+
+_iq convert_pulse_to_velocity(uint16_t actual_velocity){
+    return _IQdiv(_IQmpy(_IQ(actual_velocity - BIT_15), _IQ(_2PI)), oConfig->CONST_ENC_RESOLUTION);
+}
+
+_iq convert_pulse_to_current(uint16_t actual_current){
+    return _IQmpy(_IQ(actual_current), oConfig->CONST_PULSE_TO_CUR_SLOPE) + oConfig->CONST_PULSE_TO_CUR_OFFSET;
+}
+
+uint16_t convert_position_to_pulse(_iq pos){
+    return _IQint(_IQdiv(_IQmpy(oConfig->CONST_ENC_RESOLUTION, pos), _IQ(_2PI)) + oConfig->CONST_ZERO_POSITION);
+}
+    
+uint16_t convert_velocity_to_pulse(_iq vel){
+    return _IQint(_IQdiv(_IQmpy(oConfig->CONST_ENC_RESOLUTION, vel), _IQ(_2PI)) + _IQ(BIT_15));
+}
+
+uint16_t convert_current_to_pulse(_iq cur){
+    return _IQint(_IQmpy(cur, oConfig->CONST_CUR_TO_PULSE_SLOPE) + oConfig->CONST_CUR_TO_PULSE_OFFSET);
+}
+

@@ -108,7 +108,7 @@ void sendmessage(uint32_t StdId,uint32_t ExtId,uint8_t IDE,uint8_t  RTR, uint8_t
 //		Txdata[4] = (int)send_data&0x00ff;
 //		Txdata[3] = (int)send_data>>8;
 //		Txdata[1] = 0x01;
-    Txdata[0] = _IQint(oPdo->angle_elec);
+    Txdata[0] = _IQint(oPdo->iqPosElec);
 //		printf("TX ID:0x%X\r\n",Can_Tx.ExtId);
 //	printf("TX DATA:%02X%02X%02X%02X%02X%02X%02X%02X\r\n",Txdata[0],Txdata[1],Txdata[2],Txdata[3],Txdata[4],Txdata[5],Txdata[6],Txdata[7]);
 	HAL_CAN_AddTxMessage(&hcan,&Can_Tx,Txdata,&pTxMailbox);
