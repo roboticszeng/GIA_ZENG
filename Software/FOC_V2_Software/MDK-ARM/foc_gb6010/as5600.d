@@ -1,6 +1,6 @@
 foc_gb6010\as5600.o: ..\Core\Src\AS5600.c
 foc_gb6010\as5600.o: ../Core/Inc/as5600.h
-foc_gb6010\as5600.o: C:\Keil_v5\ARM\ARMCC\Bin\..\include\stdint.h
+foc_gb6010\as5600.o: d:\Keil_v5\ARM\ARMCC\Bin\..\include\stdint.h
 foc_gb6010\as5600.o: ../Drivers/STM32F1xx_HAL_Driver/Inc/stm32f1xx_hal.h
 foc_gb6010\as5600.o: ../Core/Inc/stm32f1xx_hal_conf.h
 foc_gb6010\as5600.o: ../Drivers/STM32F1xx_HAL_Driver/Inc/stm32f1xx_hal_rcc.h
@@ -14,7 +14,7 @@ foc_gb6010\as5600.o: ../Drivers/CMSIS/Include/cmsis_armcc.h
 foc_gb6010\as5600.o: ../Drivers/CMSIS/Device/ST/STM32F1xx/Include/system_stm32f1xx.h
 foc_gb6010\as5600.o: ../Drivers/STM32F1xx_HAL_Driver/Inc/stm32f1xx_hal.h
 foc_gb6010\as5600.o: ../Drivers/STM32F1xx_HAL_Driver/Inc/Legacy/stm32_hal_legacy.h
-foc_gb6010\as5600.o: C:\Keil_v5\ARM\ARMCC\Bin\..\include\stddef.h
+foc_gb6010\as5600.o: d:\Keil_v5\ARM\ARMCC\Bin\..\include\stddef.h
 foc_gb6010\as5600.o: ../Drivers/STM32F1xx_HAL_Driver/Inc/stm32f1xx_hal_rcc_ex.h
 foc_gb6010\as5600.o: ../Drivers/STM32F1xx_HAL_Driver/Inc/stm32f1xx_hal_gpio.h
 foc_gb6010\as5600.o: ../Drivers/STM32F1xx_HAL_Driver/Inc/stm32f1xx_hal_gpio_ex.h
@@ -35,7 +35,7 @@ foc_gb6010\as5600.o: ../Drivers/STM32F1xx_HAL_Driver/Inc/stm32f1xx_hal_uart.h
 foc_gb6010\as5600.o: ../Core/Inc/controll.h
 foc_gb6010\as5600.o: ../Core/Inc/main.h
 foc_gb6010\as5600.o: ../IQMath-master/IQmathLib.h
-foc_gb6010\as5600.o: C:\Keil_v5\ARM\ARMCC\Bin\..\include\limits.h
-foc_gb6010\as5600.o: C:\Keil_v5\ARM\ARMCC\Bin\..\include\stdlib.h
+foc_gb6010\as5600.o: d:\Keil_v5\ARM\ARMCC\Bin\..\include\limits.h
+foc_gb6010\as5600.o: d:\Keil_v5\ARM\ARMCC\Bin\..\include\stdlib.h
 foc_gb6010\as5600.o: ../Core/Inc/i2c.h
 foc_gb6010\as5600.o: ../Core/Inc/gpio.h

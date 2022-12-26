@@ -19,7 +19,7 @@
 
 ## Bit[2~3]: PDO值
 
-### 1. ActualPosition==(ADDRESS = 0x3000)==
+### 1. ActualPosition==(ADDRESS = 0x3082)==
 
 ```
 Bit[2] = _get_high_byte_uint(oPdo->actual_position)
@@ -44,7 +44,7 @@ $$
 #define _get_low_byte_uint(data) (data & 0x00ff) //取无符号整型数据的低8位
 ```
 
-### 2. ActualVelocity==(ADDRESS = 0x3001)==
+### 2. ActualVelocity==(ADDRESS = 0x3085)==
 
 ```
 Bit[2] = _get_high_byte_int(oPdo->actual_velocity)
@@ -79,7 +79,7 @@ $$
 get_velocity 
 ```
 
-### 3. Actual Current-Q==(ADDRESS = 0x3002)==
+### 3. Actual Current-Q==(ADDRESS = 0x330E)==
 
 ```
 Bit[2] = _get_high_byte_uint(oPdo->actual_current_q)
@@ -104,7 +104,7 @@ $$
 convert_current_to_pulse
 ```
 
-### 4. Actual Current-D==(ADDRESS = 0x3003)==
+### 4. Actual Current-D==(ADDRESS = 0x330D)==
 
 ```
 Bit[2] = _get_high_byte_uint(oPdo->actual_current_d)
@@ -113,7 +113,7 @@ Bit[3] = _get_low_byte_uint(oPdo->actual_current_d)
 
 和3.完全一样
 
-### 5. Mode Of Operation Display==(ADDRESS=0x3004)==
+### 5. Mode Of Operation Display==(ADDRESS=0x3081)==
 
 ```
 Bit[2] = 0x00;
@@ -122,7 +122,7 @@ Bit[3] = oPdo->mode;
 
 mode取值范围0x00,0x08,0x09,0x0a
 
-### 6. Following Error==(ADDRESS=0x3005)==
+### 6. Following Error==(ADDRESS=0x3084)==
 
 ```
 switch (oPdo->mode){

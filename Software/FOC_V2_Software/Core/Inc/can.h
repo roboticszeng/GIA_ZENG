@@ -41,8 +41,9 @@ extern CAN_HandleTypeDef hcan;
 void MX_CAN_Init(void);
 
 /* USER CODE BEGIN Prototypes */
+void convert_pdo_to_tx(uint32_t ext_id, uint32_t data);
 void CAN_User_Init(CAN_HandleTypeDef* hcan );
-void sendmessage(uint32_t StdId,uint32_t ExtId,uint8_t IDE,uint8_t  RTR, uint8_t DLC,float send_data);
+void can_send_pdo(void);
 void sendOrder(uint32_t StdId,uint32_t ExtId,uint8_t IDE,uint8_t  RTR, uint8_t DLC);
 /* USER CODE END Prototypes */
 

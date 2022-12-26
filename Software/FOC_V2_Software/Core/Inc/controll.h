@@ -18,6 +18,11 @@ extern "C" {
 
 /* USER CODE BEGIN Private defines */
 
+#define _check_data(data, std) ((data == std)?1:0)
+#define _convert_8bit_to_16bit(byte_h, byte_l) (byte_h * 0x100 + byte_l)
+#define _get_high_byte_uint(data) ((data & 0xff00) >> 8) //取无符号整型数据的高8位
+#define _get_low_byte_uint(data) (data & 0x00ff) //取无符号整型数据的低8位
+    
 /* USER CODE END Private defines */
 
 
@@ -115,6 +120,8 @@ typedef struct{
     uint16_t target_position;
     uint16_t target_velocity;
     uint16_t target_current_q;
+    
+    uint16_t actual_position_prev;
     
     
     

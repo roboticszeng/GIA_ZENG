@@ -143,8 +143,12 @@ pdo_typedef* pdo_new(void) {
 }
 
 void pdo_init(pdo_typedef *handle){
-    handle->iqPos = _IQ(0.0);
-    handle->iqPosElec = _IQ(0.0);
+    
+    handle->mode = MODE_CSP;
+    handle->target_position = 0;
+    handle->target_velocity = BIT_15;
+    handle->target_current_q = BIT_15;
+    
 }
 
 
@@ -243,7 +247,6 @@ void compute_svpwm(_iq Uq, _iq Ud, _iq angle_elec)
 
 /*** foc ***/
 /***********************************************************************************************************************************************/
-
 
 uint16_t compute_following_error(pdo_typedef* handle){
     switch (handle->mode){

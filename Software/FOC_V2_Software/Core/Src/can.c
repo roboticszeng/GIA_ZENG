@@ -33,11 +33,6 @@ extern sdo_typedef* oConfig;
 extern pdo_typedef* oPdo;
 extern filter_typedef* oFilterVelocity;
 
-int std_id = 0x7e9;
-int ext_id = 0x3507;
-
-int joint_id = 2;
-
 void CAN_User_Init(CAN_HandleTypeDef* hcan )   //用户初始化函数
 {
     int mask;
@@ -49,27 +44,25 @@ void CAN_User_Init(CAN_HandleTypeDef* hcan )   //用户初始化函数
   sFilterConfig.FilterScale = CAN_FILTERSCALE_32BIT;    //设为32位
   sFilterConfig.FilterFIFOAssignment = CAN_FILTER_FIFO0;    //接收到的报文放入到FIFO0中
     
-  sFilterConfig.FilterIdHigh = ((joint_id + 2) & 0x06) >> 1;   // 0x01
-  sFilterConfig.FilterIdLow  = ((joint_id + 2) & 0x01) << 15; // 0x8000
+  sFilterConfig.FilterIdHigh = ((JOINT_ID + 3) & 0x06) >> 1;   // 0x01
+  sFilterConfig.FilterIdLow  = ((JOINT_ID + 3) & 0x01) << 15; // 0x8000
     
   // 固定的
   sFilterConfig.FilterMaskIdHigh = 0x03;
   sFilterConfig.FilterMaskIdLow  = 0x8000;
-    
-
     
   sFilterConfig.SlaveStartFilterBank  = 0;
  
   HAL_Status=HAL_CAN_ConfigFilter(hcan, &sFilterConfig);
   HAL_Status=HAL_CAN_Start(hcan);  //开启CAN
  
-  if(HAL_Status!=HAL_OK){
+//  if(HAL_Status!=HAL_OK){
 //	printf("开启CAN失败\r\n");
- }
+// }
  HAL_Status=HAL_CAN_ActivateNotification(hcan,CAN_IT_RX_FIFO0_MSG_PENDING);
- if(HAL_Status!=HAL_OK){
-	//printf("开启挂起中段允许失败\r\n");
-  }
+// if(HAL_Status!=HAL_OK){
+//	printf("开启挂起中段允许失败\r\n");
+//  }
 }
  
 /*
@@ -94,25 +87,49 @@ void sendOrder(uint32_t StdId,uint32_t ExtId,uint8_t IDE,uint8_t  RTR, uint8_t D
 	HAL_CAN_AddTxMessage(&hcan,&Can_Tx,Txdata,&pTxMailbox);
  
 }
-void sendmessage(uint32_t StdId,uint32_t ExtId,uint8_t IDE,uint8_t  RTR, uint8_t DLC,float send_data)
+
+extern pdo_typedef* oPdo;
+void can_send_pdo(void)
 {
-	uint32_t pTxMailbox = 0;
-	uint8_t i;
-	Can_Tx.StdId = StdId;//标准ID
-	Can_Tx.ExtId = ExtId;//扩展ID
-	Can_Tx.IDE = IDE;//CAN_ID_STD为标准ID CAN_ID_EXT为使用扩展ID
-	Can_Tx.RTR = RTR;					//0(CAN_RTR_DATA)为数据帧 1(CAN_RTR_REMOTE)为远程帧
-	Can_Tx.DLC = DLC;					//数据长度
-	//将浮点数转化成4个字节存在tdata[4]----tdata[7]中
-	send_data=send_data*100;
-//		Txdata[4] = (int)send_data&0x00ff;
-//		Txdata[3] = (int)send_data>>8;
-//		Txdata[1] = 0x01;
-    Txdata[0] = _IQint(oPdo->iqPosElec);
-//		printf("TX ID:0x%X\r\n",Can_Tx.ExtId);
-//	printf("TX DATA:%02X%02X%02X%02X%02X%02X%02X%02X\r\n",Txdata[0],Txdata[1],Txdata[2],Txdata[3],Txdata[4],Txdata[5],Txdata[6],Txdata[7]);
-	HAL_CAN_AddTxMessage(&hcan,&Can_Tx,Txdata,&pTxMailbox);
+
+    convert_pdo_to_tx(ADDR_MODE_OF_OPERATION, oPdo->mode);
+    convert_pdo_to_tx(ADDR_TARGET_POSITION, oPdo->target_position);
+    convert_pdo_to_tx(ADDR_TARGET_VELOCITY, oPdo->target_velocity);
+    convert_pdo_to_tx(ADDR_TARGET_CURRENT_Q, oPdo->target_current_q);
+    
+    convert_pdo_to_tx(ADDR_MODE_OF_OPERATION_DISPLAY, oPdo->mode);
+    convert_pdo_to_tx(ADDR_ACTUAL_POSITION, oPdo->actual_position);
+    convert_pdo_to_tx(ADDR_FOLLOWING_ERROR, oPdo->following_error);
+    convert_pdo_to_tx(ADDR_ACTUAL_VELOCITY, oPdo->actual_velocity);
+    convert_pdo_to_tx(ADDR_ACTUAL_CURRENT_Q, oPdo->actual_current_q);
+    convert_pdo_to_tx(ADDR_ACTUAL_CURRENT_D, oPdo->actual_current_d);
+    
+
 }
+
+void convert_pdo_to_tx(uint32_t ext_id, uint32_t data){
+    CAN_TxHeaderTypeDef can_tx_local;
+    static uint32_t pTxMailbox = 0;
+    static uint8_t can_tx_data[8];
+	uint8_t i;
+	can_tx_local.StdId = JOINT_ID;//标准ID
+	
+	can_tx_local.IDE = CAN_ID_EXT;//CAN_ID_STD为标准ID CAN_ID_EXT为使用扩展ID
+	can_tx_local.RTR = 0;					//0(CAN_RTR_DATA)为数据帧 1(CAN_RTR_REMOTE)为远程帧
+	can_tx_local.DLC = 8;					//数据长度
+    
+    can_tx_data[0] = DATA_HEAD;
+    can_tx_data[1] = JOINT_ID;
+    can_tx_data[6] = DATA_TAIL_PREV;
+    can_tx_data[7] = DATA_TAIL;
+    
+    can_tx_local.ExtId = ext_id;
+    can_tx_data[2] = _get_high_byte_uint(data);
+    can_tx_data[3] = _get_low_byte_uint(data);
+    while(HAL_CAN_GetTxMailboxesFreeLevel(&hcan)==0);
+	HAL_CAN_AddTxMessage(&hcan, &can_tx_local, can_tx_data, &pTxMailbox);
+}
+
 /* USER CODE END 0 */
 
 CAN_HandleTypeDef hcan;

@@ -45,6 +45,7 @@ int fputc(int ch, FILE *f) {
 
 #include "controll.h"
 #include "AS5600.h"
+#include "can.h"
 
 /* USER CODE END Includes */
 
@@ -121,7 +122,11 @@ int main(void)
     oFilterVelocity = filter_new();
     
     
-    
+    pid_init(oPidVelocity, 1.0, 100.0, 100e-3, 1e6, 1e6);
+    as5600_init(oEncoder);
+    config_init(oConfig);
+    pdo_init(oPdo);
+    filter_init(oFilterVelocity, 100.0, 0.1);
     
 
     
@@ -149,11 +154,10 @@ int main(void)
   /* Initialize all configured peripherals */
   MX_GPIO_Init();
   MX_DMA_Init();
-  
+  MX_TIM1_Init();
   MX_USART2_UART_Init();
   MX_ADC1_Init();
   MX_I2C1_Init();
-  MX_TIM1_Init();
   MX_TIM2_Init();
   MX_TIM3_Init();
   MX_TIM4_Init();
@@ -171,20 +175,18 @@ int main(void)
     HAL_TIM_Base_Start_IT(&htim2);
     HAL_TIM_Base_Start_IT(&htim3);
     HAL_TIM_Base_Start_IT(&htim4);
+    
     HAL_TIM_PWM_Start(&htim1,TIM_CHANNEL_1);
     HAL_TIM_PWM_Start(&htim1,TIM_CHANNEL_2);
     HAL_TIM_PWM_Start(&htim1,TIM_CHANNEL_3);
+    
     
 //    for(int i = 0; i < 500; i++){
 //        setPhaseVoltage(0.5, 0.0, 0.0);
 //        HAL_Delay(10);
 //    }
     
-    pid_init(oPidVelocity, 1.0, 100.0, 100e-3, 1e6, 1e6);
-    as5600_init(oEncoder);
-    config_init(oConfig);
-    pdo_init(oPdo);
-    filter_init(oFilterVelocity, 2.0, 0.1);
+    
     
     CAN_User_Init(&hcan);
     
@@ -204,18 +206,23 @@ int main(void)
   while (1)
   {
       
-      as5600_get_angle(oEncoder, oPdo);
+//      as5600_get_angle(oEncoder, oPdo);
+      compute_following_error(oPdo);
 
-      printf("%.3f, %.3f, ", _IQtoF(oPdo->iqPos), _IQtoF(oPdo->iqPosElec));
-      printf("%.3f", _IQtoF(oPidVelocity->Kp));
+      
+      printf("%.3f, ", _IQtoF(oPdo->iqPos));
+      printf("%.3f, ", _IQtoF(oPdo->iqVel));
+      printf("%d, %d, ", oPdo->target_position, oPdo->actual_position_prev);
+      printf("%d, %d", oPdo->actual_velocity, oPdo->following_error);
       printf("\r\n");
       
-    if(can_rx_finish_flag==1)//接收完成
-    {
-        sendmessage(0x123,0x14550151,CAN_ID_EXT,0,8,26.2);
-        can_rx_finish_flag=0;
-        HAL_GPIO_TogglePin(LED_GPIO_Port, LED_Pin);
-    }
+      HAL_GPIO_WritePin(GPIOC, GPIO_PIN_13, GPIO_PIN_SET);
+      
+      can_send_pdo();
+      
+      HAL_GPIO_WritePin(GPIOC, GPIO_PIN_13, GPIO_PIN_RESET);
+      
+      
       
       HAL_Delay(100);
     /* USER CODE END WHILE */

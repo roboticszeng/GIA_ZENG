@@ -25,6 +25,7 @@
 
 #include "controll.h"
 #include "as5600.h"
+#include "can.h"
 
 /* USER CODE END Includes */
 
@@ -242,6 +243,7 @@ void USB_HP_CAN1_TX_IRQHandler(void)
   /* USER CODE END USB_HP_CAN1_TX_IRQn 0 */
   HAL_CAN_IRQHandler(&hcan);
   /* USER CODE BEGIN USB_HP_CAN1_TX_IRQn 1 */
+    
 
   /* USER CODE END USB_HP_CAN1_TX_IRQn 1 */
 }
@@ -310,7 +312,9 @@ void TIM2_IRQHandler(void)
 //     HAL_GPIO_WritePin(GPIOC, GPIO_PIN_13, GPIO_PIN_SET);
     // 获取角度原始信息
 //    lastPos = actualPos;
-//    AS5600_get_rawAngle(encoder, &actualPos);
+    as5600_get_angle(oEncoder, oPdo);
+    
+//    can_send_pdo();
 //    get_angle_elec();
 //    actualVel = (actualPos - lastPos) * 1000;
     
@@ -371,20 +375,35 @@ void TIM4_IRQHandler(void)
 }
 
 /* USER CODE BEGIN 1 */
+
+
+
 void HAL_CAN_RxFifo0MsgPendingCallback(CAN_HandleTypeDef* hcan1)
 {
-	uint8_t i;
-//	printf("***********************************************\r\n");
 	HAL_CAN_GetRxMessage(&hcan,CAN_RX_FIFO0,&Can_Rx,Rxdata);
     can_rx_finish_flag=1;
     
+    if (_check_data(Rxdata[0], DATA_HEAD) == 0){
+        return;
+    }
+    
     switch (Can_Rx.ExtId){
-        case 0x3507:
-        oPidVelocity->Kp = _IQ(Rxdata[0]);
+        
+        case ADDR_TARGET_POSITION:
+            oPdo->target_position = _convert_8bit_to_16bit(Rxdata[2], Rxdata[3]);
         break;
-        case 0x4507:
-        oPidVelocity->Kp = _IQ(Rxdata[0]);
+        
+        case ADDR_TARGET_VELOCITY:
+            oPdo->target_velocity = _convert_8bit_to_16bit(Rxdata[2], Rxdata[3]);
         break;
+        
+        case ADDR_TARGET_CURRENT_Q:
+            oPdo->target_current_q = _convert_8bit_to_16bit(Rxdata[2], Rxdata[3]);
+        
+        case ADDR_MODE_OF_OPERATION:
+            oPdo->mode = _convert_8bit_to_16bit(Rxdata[2], Rxdata[3]);
+        break;
+        
     }
     
     
