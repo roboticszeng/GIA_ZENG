@@ -22,67 +22,18 @@ Dialog DLL:      TCM.DLL V1.14.4.0
  
 <h2>Project:</h2>
 D:\GitHub\GIA_ZENG\Software\FOC_V2_Software\MDK-ARM\foc_gb6010.uvprojx
-Project File Date:  12/26/2022
+Project File Date:  01/10/2023
 
 <h2>Output:</h2>
 Build target 'foc_gb6010'
-compiling AS5600.c...
-../Core/Inc/as5600.h(136): warning:  #1-D: last line of file ends without a newline
-  #endif        /* AS5600_INCLUDED */
-..\Core\Src\AS5600.c(64): warning:  #111-D: statement is unreachable
-        return HAL_OK;
-..\Core\Src\AS5600.c(211): warning:  #167-D: argument of type "volatile uint8_t *" is incompatible with parameter of type "uint8_t *"
-  HAL_StatusTypeDef AS5600_write_config_register(encoder_typedef* const handle) { return HAL_I2C_Mem_Write(handle->i2c_handle, AS5600_SHIFTED_SLAVE_ADDRESS, AS5600_REGISTER_CONF_HIGH, I2C_MEMADD_SIZE_8BIT, handle->config_register, 2, handle->i2c_timeout); }
-..\Core\Src\AS5600.c(254): warning:  #1-D: last line of file ends without a newline
-  }
-..\Core\Src\AS5600.c: 4 warnings, 0 errors
-compiling controll.c...
-..\Core\Src\controll.c(269): warning:  #111-D: statement is unreachable
-      return handle->following_error;
-..\Core\Src\controll.c(272): warning:  #940-D: missing return statement at end of non-void function "compute_following_error"
-  }
-..\Core\Src\controll.c(265): warning:  #177-D: label "otherwise" was declared but never referenced
-          otherwise:
-..\Core\Src\controll.c: 3 warnings, 0 errors
 compiling main.c...
 ../Core/Inc/AS5600.h(136): warning:  #1-D: last line of file ends without a newline
   #endif        /* AS5600_INCLUDED */
-../Core/Src/main.c(198): warning:  #177-D: variable "c" was declared but never referenced
-      _iq c = _IQ(0.0);
-../Core/Src/main.c(199): warning:  #177-D: variable "p_raw" was declared but never referenced
-      uint16_t p_raw, p;
-../Core/Src/main.c(199): warning:  #177-D: variable "p" was declared but never referenced
-      uint16_t p_raw, p;
-../Core/Src/main.c(200): warning:  #177-D: variable "pid_res" was declared but never referenced
-      _iq pid_res = _IQ(0.0);
-../Core/Src/main.c(201): warning:  #177-D: variable "angle_filt" was declared but never referenced
-      _iq angle_filt;
-../Core/Src/main.c: 6 warnings, 0 errors
-compiling gpio.c...
-compiling adc.c...
-compiling can.c...
-../Core/Inc/as5600.h(136): warning:  #1-D: last line of file ends without a newline
-  #endif        /* AS5600_INCLUDED */
-../Core/Src/can.c(38): warning:  #177-D: variable "mask" was declared but never referenced
-      int mask;
-../Core/Src/can.c(40): warning:  #550-D: variable "HAL_Status" was set but never used
-    HAL_StatusTypeDef  HAL_Status;
-../Core/Src/can.c(114): warning:  #177-D: variable "i" was declared but never referenced
-        uint8_t i;
-../Core/Src/can.c: 4 warnings, 0 errors
-compiling dma.c...
-compiling i2c.c...
-compiling tim.c...
-compiling usart.c...
-compiling stm32f1xx_it.c...
-../Core/Inc/as5600.h(136): warning:  #1-D: last line of file ends without a newline
-  #endif        /* AS5600_INCLUDED */
-../Core/Src/stm32f1xx_it.c: 1 warning, 0 errors
-compiling stm32f1xx_hal_msp.c...
+../Core/Src/main.c: 1 warning, 0 errors
 linking...
-Program Size: Code=19636 RO-data=292 RW-data=72 ZI-data=2192  
+Program Size: Code=25320 RO-data=292 RW-data=148 ZI-data=2196  
 FromELF: creating hex file...
-"foc_gb6010\foc_gb6010.axf" - 0 Error(s), 18 Warning(s).
+"foc_gb6010\foc_gb6010.axf" - 0 Error(s), 1 Warning(s).
 
 <h2>Software Packages used:</h2>
 

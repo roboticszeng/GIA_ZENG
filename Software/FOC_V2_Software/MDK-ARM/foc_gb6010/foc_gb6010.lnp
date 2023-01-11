@@ -1,8 +1,8 @@
 --cpu Cortex-M3
 "foc_gb6010\startup_stm32f103xb.o"
+"foc_gb6010\controll.o"
 "foc_gb6010\as5600.o"
 "..\IQMath-master\rvmdk-cm3\IQmathLib-cm3.lib"
-"foc_gb6010\controll.o"
 "foc_gb6010\main.o"
 "foc_gb6010\gpio.o"
 "foc_gb6010\adc.o"

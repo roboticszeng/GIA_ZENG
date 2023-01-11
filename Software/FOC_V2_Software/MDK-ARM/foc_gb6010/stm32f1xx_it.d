@@ -39,3 +39,4 @@ foc_gb6010\stm32f1xx_it.o: d:\Keil_v5\ARM\ARMCC\Bin\..\include\limits.h
 foc_gb6010\stm32f1xx_it.o: d:\Keil_v5\ARM\ARMCC\Bin\..\include\stdlib.h
 foc_gb6010\stm32f1xx_it.o: ../Core/Inc/as5600.h
 foc_gb6010\stm32f1xx_it.o: ../Core/Inc/can.h
+foc_gb6010\stm32f1xx_it.o: ../Core/Inc/adc.h

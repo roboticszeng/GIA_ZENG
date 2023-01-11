@@ -422,6 +422,11 @@
           <GroupName>Application/User/Core</GroupName>
           <Files>
             <File>
+              <FileName>controll.c</FileName>
+              <FileType>1</FileType>
+              <FilePath>..\Core\Src\controll.c</FilePath>
+            </File>
+            <File>
               <FileName>AS5600.c</FileName>
               <FileType>1</FileType>
               <FilePath>..\Core\Src\AS5600.c</FilePath>
@@ -435,11 +440,6 @@
               <FileName>IQmathLib-cm3.lib</FileName>
               <FileType>4</FileType>
               <FilePath>..\IQMath-master\rvmdk-cm3\IQmathLib-cm3.lib</FilePath>
-            </File>
-            <File>
-              <FileName>controll.c</FileName>
-              <FileType>1</FileType>
-              <FilePath>..\Core\Src\controll.c</FilePath>
             </File>
             <File>
               <FileName>main.c</FileName>

@@ -33,3 +33,7 @@ foc_gb6010\adc.o: ../Drivers/STM32F1xx_HAL_Driver/Inc/stm32f1xx_hal_pwr.h
 foc_gb6010\adc.o: ../Drivers/STM32F1xx_HAL_Driver/Inc/stm32f1xx_hal_tim.h
 foc_gb6010\adc.o: ../Drivers/STM32F1xx_HAL_Driver/Inc/stm32f1xx_hal_tim_ex.h
 foc_gb6010\adc.o: ../Drivers/STM32F1xx_HAL_Driver/Inc/stm32f1xx_hal_uart.h
+foc_gb6010\adc.o: ../Core/Inc/controll.h
+foc_gb6010\adc.o: ../IQMath-master/IQmathLib.h
+foc_gb6010\adc.o: d:\Keil_v5\ARM\ARMCC\Bin\..\include\limits.h
+foc_gb6010\adc.o: d:\Keil_v5\ARM\ARMCC\Bin\..\include\stdlib.h
