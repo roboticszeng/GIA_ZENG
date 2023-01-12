@@ -13,18 +13,18 @@ pid_typedef* pid_new(void) {
     return (pid_typedef*)calloc(1, sizeof(pid_typedef)); 
 }
 
-void pid_init(pid_typedef *handle, float Kp, float Ki, float T, float Max, float MaxInt) {
+void pid_init(pid_typedef *handle, _iq15 Kp, _iq15 Ki, _iq T, _iq15 Max, _iq15 MaxInt) {
 
 	/* Clear controller variables */
     // 暂时不用Kd
     
-    handle->Kp = _IQ15(Kp);
-    handle->Ki = _IQ15(Ki);
-    handle->T = _IQ(T);
-    handle->limMax = _IQ15(Max);
-    handle->limMin = -_IQ15(Max);
-    handle->limMaxInt = _IQ15(MaxInt);
-    handle->limMinInt = -_IQ15(MaxInt);
+    handle->Kp = Kp;
+    handle->Ki = Ki;
+    handle->T = T;
+    handle->limMax = Max;
+    handle->limMin = -Max;
+    handle->limMaxInt = MaxInt;
+    handle->limMinInt = -MaxInt;
     
     handle->Kd = _IQ15(0.0);
     handle->tau = _IQ15(0.0);
@@ -41,12 +41,9 @@ _iq pid_update(pid_typedef *pid, _iq setpoint, _iq measurement) {
     static _iq15 error;
     error = _IQtoIQ15(setpoint) - _IQtoIQ15(measurement);
     
-//    printf("%f\r\n", _IQ15toF(error));
-    
     pid->proportional = _IQ15mpy(pid->Kp, error);
     
     pid->integrator = pid->integrator + _IQ15mpyIQX(_IQmpy(_IQmpy(_IQ(0.5), _IQ15toIQ(pid->Ki)), pid->T), 20, (error + pid->prevError), 15);
-//    pid->integrator = _IQ15mpyIQX(_IQmpy(_IQmpy(_IQ(0.5), _IQ15toIQ(pid->Ki)), pid->T), 20, (error + pid->prevError), 15);
     
     if (pid->integrator > pid->limMaxInt) {
         pid->integrator = pid->limMaxInt;
@@ -83,11 +80,12 @@ filter_typedef* filter_new(void){
 }
 
 
-void filter_init(filter_typedef* handle, float cutoff_freq, float sample_time){
+void filter_init(filter_typedef* handle, _iq cutoff_freq, _iq sample_time){
     
-    float rc = 1.0 / (_2PI * cutoff_freq);
-    handle->k[0] = _IQ(sample_time / (sample_time + rc));
-    handle->k[1] = _IQ(rc / (sample_time + rc));
+    _iq rc = _IQdiv(_IQ(1.0), _IQmpy(_IQ(_2PI), cutoff_freq));
+    handle->k[0] = _IQdiv(sample_time, sample_time + rc);
+    handle->k[1] = _IQdiv(rc, sample_time + rc);
+    
 //    handle->k[0] = _IQ(0.1);
 //    handle->k[1] = _IQ(0.9);
     
@@ -157,8 +155,32 @@ void config_init(sdo_typedef *handle){
         handle->CONST_MCU_VOLTAGE);
     handle->CONST_CUR_TO_PULSE_OFFSET = _IQdiv(handle->CONST_ADC_RESOLUTION, _IQ(2.0));
     
-    handle->CONST_CURRENT_CONTROL_TIME = 160e-6;
-    handle->CONST_POSITION_CONTROL_TIME = 320e-6;
+    handle->CONST_CURRENT_CONTROL_TIME = _IQ(160e-6);
+    handle->CONST_POSITION_CONTROL_TIME = _IQ(320e-6);
+    
+    
+    handle->PID_POS_KP = _IQ15(40.0);
+    handle->PID_POS_KI = _IQ15(0.0);
+    handle->PID_POS_MAX = _IQ15(15.0);
+    handle->PID_POS_INTMAX = _IQ15(15.0);
+    
+    handle->PID_VEL_KP = _IQ15(0.15);
+    handle->PID_VEL_KI = _IQ15(1.5);
+    handle->PID_VEL_MAX = _IQ15(2.0);
+    handle->PID_VEL_INTMAX = _IQ15(1.5);
+    
+    handle->PID_CUR_Q_KP = _IQ15(0.9);
+    handle->PID_CUR_Q_KI = _IQ15(50.0);
+    handle->PID_CUR_Q_MAX = _IQ15(0.9);
+    handle->PID_CUR_Q_INTMAX = _IQ15(0.5);
+    handle->PID_CUR_D_KP = _IQ15(0.3);
+    handle->PID_CUR_D_KI = _IQ15(0.0);
+    handle->PID_CUR_D_MAX = _IQ15(0.2);
+    handle->PID_CUR_D_INTMAX = _IQ15(0.1);
+    
+    handle->FILT_VEL_CUTOFF_FREQ = _IQ(20.0);
+    handle->FILT_CUR_Q_CUTOFF_FREQ = _IQ(100.0);
+    handle->FILT_CUR_D_CUTOFF_FREQ = _IQ(100.0);
     
 }
 
@@ -311,10 +333,10 @@ _iq convert_pulse_to_position(uint16_t actual_position){
     return _IQ15toIQ(_IQ15div(_IQ15mpy(_IQ15(actual_position) - oConfig->CONST_ZERO_POSITION, _IQ15(_2PI)), oConfig->CONST_ENC_RESOLUTION));
 }
 
-_iq convert_pulse_to_velocity(uint32_t actual_velocity){
+_iq convert_pulse_to_velocity(int32_t actual_velocity){
     
     
-    return _IQ((float)(actual_velocity - BIT_15)  / 4096.0 * _2PI);
+    return _IQ((float)(actual_velocity)  / 4096.0 * _2PI);
     
 //    return _IQ15toIQ(_IQ15div(_IQ15mpyIQX(_IQ15(actual_velocity - BIT_15), 15, _IQ(_2PI), 20), oConfig->CONST_ENC_RESOLUTION));
     

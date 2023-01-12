@@ -234,7 +234,7 @@ HAL_StatusTypeDef as5600_get_angle(encoder_typedef* const enc_handle, pdo_typede
 //    pdo_handle->actual_velocity = (pdo_handle->actual_position - pdo_handle->actual_position_prev) * \
 //        _IQint(_IQdiv(_IQ(1.0), oConfig->CONST_POSITION_SAMP_TIME)) + BIT_15;
     
-    pdo_handle->actual_velocity = (pdo_handle->actual_position - pdo_handle->actual_position_prev) * 1000 + BIT_15;
+    pdo_handle->actual_velocity = (pdo_handle->actual_position - pdo_handle->actual_position_prev) * 1000;
     
     pdo_handle->iqVel = convert_pulse_to_velocity(pdo_handle->actual_velocity);
     

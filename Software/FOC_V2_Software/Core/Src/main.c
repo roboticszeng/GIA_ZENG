@@ -94,6 +94,7 @@ encoder_typedef* oEncoder;
 sdo_typedef* oConfig;
 pdo_typedef* oPdo;
 
+pid_typedef* oPidPosition;
 pid_typedef* oPidVelocity;
 pid_typedef* oPidCurrentD;
 pid_typedef* oPidCurrentQ;
@@ -128,9 +129,11 @@ int main(void)
     oConfig = config_new();
     oPdo = pdo_new();
     
+    oPidPosition = pid_new();
     oPidVelocity = pid_new();
-    oPidCurrentD = pid_new();
     oPidCurrentQ = pid_new();
+    oPidCurrentD = pid_new();
+    
     
     oFilterVelocity = filter_new();
     oFilterCurrentD = filter_new();
@@ -142,13 +145,15 @@ int main(void)
     config_init(oConfig);
     pdo_init(oPdo);
     
-    pid_init(oPidVelocity, 0.05, 0.8, oConfig->CONST_POSITION_CONTROL_TIME, 2.0, 1.5);
-    pid_init(oPidCurrentQ, 1.0, 200.0, oConfig->CONST_CURRENT_CONTROL_TIME, 0.9, 0.5);
-    pid_init(oPidCurrentD, 0.5, 0.0, oConfig->CONST_CURRENT_CONTROL_TIME, 0.2, 0.1);
+    pid_init(oPidPosition, oConfig->PID_POS_KP, oConfig->PID_POS_KI, oConfig->CONST_POSITION_CONTROL_TIME, oConfig->PID_POS_MAX, oConfig->PID_POS_INTMAX);
+    pid_init(oPidVelocity, oConfig->PID_VEL_KP, oConfig->PID_VEL_KI, oConfig->CONST_POSITION_CONTROL_TIME, oConfig->PID_VEL_MAX, oConfig->PID_VEL_INTMAX);
+    pid_init(oPidCurrentQ, oConfig->PID_CUR_Q_KP, oConfig->PID_CUR_Q_KI, oConfig->CONST_CURRENT_CONTROL_TIME, oConfig->PID_CUR_Q_MAX, oConfig->PID_CUR_Q_INTMAX);
+    pid_init(oPidCurrentD, oConfig->PID_CUR_D_KP, oConfig->PID_CUR_D_KI, oConfig->CONST_CURRENT_CONTROL_TIME, oConfig->PID_CUR_D_MAX, oConfig->PID_CUR_D_INTMAX);
     
-    filter_init(oFilterVelocity, 20.0, oConfig->CONST_POSITION_SAMP_TIME);
-    filter_init(oFilterCurrentD, 100.0, oConfig->CONST_CURRENT_SAMP_TIME);
-    filter_init(oFilterCurrentQ, 100.0, oConfig->CONST_CURRENT_SAMP_TIME);
+    filter_init(oFilterVelocity, oConfig->FILT_VEL_CUTOFF_FREQ, oConfig->CONST_POSITION_SAMP_TIME);
+    filter_init(oFilterCurrentQ, oConfig->FILT_CUR_Q_CUTOFF_FREQ, oConfig->CONST_CURRENT_SAMP_TIME);
+    filter_init(oFilterCurrentD, oConfig->FILT_CUR_D_CUTOFF_FREQ, oConfig->CONST_CURRENT_SAMP_TIME);
+    
     
     
 
@@ -209,6 +214,8 @@ int main(void)
     HAL_TIM_Base_Start_IT(&htim3);
     HAL_TIM_Base_Start_IT(&htim4);
     
+    HAL_Delay(1000);
+    
     CAN_User_Init(&hcan);
     
   /* USER CODE END 2 */
@@ -223,12 +230,16 @@ int main(void)
 //      printf("%.4f, %4f, %4f, %.4f, %.4f\r\n", _IQtoF(oPdo->iqCurD), _IQ15toF(oPidCurrentD->prevError), \
 //        _IQ15toF(oPidCurrentD->proportional), _IQ15toF(oPidCurrentD->integrator), _IQtoF(ud));
       
-      printf("%d, %.4f, %4f, %4f, %.4f, %.4f\r\n", oPdo->actual_velocity, _IQtoF(oPdo->iqVel), _IQ15toF(oPidVelocity->prevError), \
-        _IQ15toF(oPidVelocity->proportional), _IQ15toF(oPidVelocity->integrator), _IQtoF(oPdo->iqTargQ));
+//      printf("%d, %.4f, %4f, %4f, %.4f, %.4f\r\n", oPdo->actual_velocity, _IQtoF(oPdo->iqVel), _IQ15toF(oPidVelocity->prevError), \
+//        _IQ15toF(oPidVelocity->proportional), _IQ15toF(oPidVelocity->integrator), _IQtoF(oPdo->iqTargQ));
 
 //      printf("%.4f, %.4f, %f\r\n", _IQtoF(oPdo->iqCurQ), _IQtoF(oPdo->iqTargQ), _IQtoF(oPdo->iqTargQ - oPdo->iqCurQ));
       
+//      printf("%.4f, %.4f\r\n", _IQtoF(oPdo->iqPos), _IQtoF(oPdo->iqPosElec));
+      
 //      printf("%.4f, %.4f, %.4f\r\n", _IQtoF(oPdo->iqVel), _IQtoF(oPdo->iqCurQ), _IQtoF(oPdo->iqTargQ));
+      printf("%.4f, %.4f, %.4f, %.4f, %.4f, %.4f, %.4f\r\n", \
+        _IQtoF(oPdo->iqPos), _IQtoF(oPdo->iqTargP), _IQtoF(oPdo->iqVel), _IQtoF(oPdo->iqTargV), _IQtoF(oPdo->iqCurQ), _IQtoF(oPdo->iqTargQ), _IQtoF(uq));
 
       HAL_GPIO_TogglePin(GPIOC, GPIO_PIN_13);
       HAL_Delay(100);

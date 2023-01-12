@@ -101,15 +101,39 @@ typedef struct{
     _iq CONST_CUR_TO_PULSE_OFFSET;
     
     // 编码器采样时间
-    float CONST_POSITION_SAMP_TIME;
+    _iq CONST_POSITION_SAMP_TIME;
     // 电流采样时间
-    float CONST_CURRENT_SAMP_TIME;
+    _iq CONST_CURRENT_SAMP_TIME;
     
     // 电流环控制时间
-    float CONST_CURRENT_CONTROL_TIME;
+    _iq CONST_CURRENT_CONTROL_TIME;
     // 位置速度环控制时间
-    float CONST_POSITION_CONTROL_TIME;
+    _iq CONST_POSITION_CONTROL_TIME;
     
+    // PID参数
+    _iq15 PID_POS_KP;
+    _iq15 PID_POS_KI;
+    _iq15 PID_POS_MAX;
+    _iq15 PID_POS_INTMAX;
+    
+    _iq15 PID_VEL_KP;
+    _iq15 PID_VEL_KI;
+    _iq15 PID_VEL_MAX;
+    _iq15 PID_VEL_INTMAX;
+    
+    _iq15 PID_CUR_Q_KP;
+    _iq15 PID_CUR_Q_KI;
+    _iq15 PID_CUR_Q_MAX;
+    _iq15 PID_CUR_Q_INTMAX;
+    _iq15 PID_CUR_D_KP;
+    _iq15 PID_CUR_D_KI;
+    _iq15 PID_CUR_D_MAX;
+    _iq15 PID_CUR_D_INTMAX;
+    
+    // 滤波器截止频率
+    _iq FILT_VEL_CUTOFF_FREQ;
+    _iq FILT_CUR_Q_CUTOFF_FREQ;
+    _iq FILT_CUR_D_CUTOFF_FREQ;
     
 } sdo_typedef;
 
@@ -132,7 +156,7 @@ typedef struct{
     
     
     uint16_t actual_position;
-    uint32_t actual_velocity;
+    int32_t actual_velocity;
     uint16_t actual_current_q;
     uint16_t actual_current_d;
     uint16_t following_error;
@@ -155,8 +179,8 @@ filter_typedef* filter_new(void);
 sdo_typedef* config_new(void);
 pdo_typedef* pdo_new(void);
 
-void pid_init(pid_typedef* pid, float Kp, float Ki, float T, float Max, float MaxInt);
-void filter_init(filter_typedef* handle, float freq, float sample_time);
+void pid_init(pid_typedef *handle, _iq15 Kp, _iq15 Ki, _iq T, _iq15 Max, _iq15 MaxInt);
+void filter_init(filter_typedef* handle, _iq cutoff_freq, _iq sample_time);
 void config_init(sdo_typedef* handle);
 void pdo_init(pdo_typedef* handle);
 
@@ -170,7 +194,7 @@ _iq compute_position_elec(_iq pos);
 
 // 单位转换
 _iq convert_pulse_to_position(uint16_t actual_position);
-_iq convert_pulse_to_velocity(uint32_t actual_velocity);
+_iq convert_pulse_to_velocity(int32_t actual_velocity);
 _iq convert_pulse_to_current(uint16_t actual_current);
 
 uint16_t convert_position_to_pulse(_iq pos);

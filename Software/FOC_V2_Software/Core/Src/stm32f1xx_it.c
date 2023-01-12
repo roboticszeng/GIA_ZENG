@@ -74,11 +74,14 @@ extern uint8_t Rxdata[8] ;
 extern float rxdata;
 uint8_t can_rx_finish_flag;//接收完成标志位
 
+_iq uq;
+_iq ud;
 
 extern encoder_typedef* oEncoder;
 extern sdo_typedef* oConfig;
 extern pdo_typedef* oPdo;
 
+extern pid_typedef* oPidPosition;
 extern pid_typedef* oPidVelocity;
 extern pid_typedef* oPidCurrentD;
 extern pid_typedef* oPidCurrentQ;
@@ -335,23 +338,22 @@ void TIM2_IRQHandler(void)
 /**
   * @brief This function handles TIM3 global interrupt.
   */
-_iq uq, ud;
 void TIM3_IRQHandler(void)
 {
   /* USER CODE BEGIN TIM3_IRQn 0 */
     // TIM3 电流环控制 频率 XHZ
-    static _iq t = 0.0;
+    
 //    static _iq target_q;
   /* USER CODE END TIM3_IRQn 0 */
   HAL_TIM_IRQHandler(&htim3);
   /* USER CODE BEGIN TIM3_IRQn 1 */
 //    HAL_GPIO_WritePin(GPIOC, GPIO_PIN_13, GPIO_PIN_SET);
      
-    
+//    static _iq t = 0.0;
 //    t = t + _IQ(oConfig->CONST_CURRENT_CONTROL_TIME);
-//    oPdo->iqTargQ = _IQsin(_IQmpy(t, _IQmpyI32(_IQ(_2PI), 100)));
+//    oPdo->iqTargQ = _IQsin(_IQmpy(t, _IQmpyI32(_IQ(_2PI), 1)));
     
-    oPdo->iqTargQ = _IQ(1.0);
+//    oPdo->iqTargQ = _IQ(1.0);
     
     uq = pid_update(oPidCurrentQ, oPdo->iqTargQ, oPdo->iqCurQ);
     ud = pid_update(oPidCurrentD, oPdo->iqTargD, oPdo->iqCurD);
@@ -382,9 +384,19 @@ void TIM4_IRQHandler(void)
   HAL_TIM_IRQHandler(&htim4);
   /* USER CODE BEGIN TIM4_IRQn 1 */
     
-//    oPdo->iqTargV = _IQ(6.0);
-//    
-//    oPdo->iqTargQ = pid_update(oPidVelocity, oPdo->iqTargV, oPdo->iqVel);
+    static _iq t = 0.0;
+    t = t + oConfig->CONST_POSITION_CONTROL_TIME;
+    oPdo->iqTargP = _IQmpy(_IQ(2.0), _IQsin(_IQmpy(t, _IQmpyI32(_IQ(_2PI), 2)))) + _IQ(4.0);
+//    oPdo->iqTargP = _IQ(_3PI_2);
+    
+    
+    oPdo->iqTargV = pid_update(oPidPosition, oPdo->iqTargP, oPdo->iqPos);
+    
+//    static _iq t = 0.0;
+//    t = t + _IQ(oConfig->CONST_POSITION_CONTROL_TIME);
+//    oPdo->iqTargV = _IQmpy(_IQ(5.0), _IQsin(_IQmpy(t, _IQmpyI32(_IQ(_2PI), 10))));
+//    oPdo->iqTargV = _IQ(0.0);
+    oPdo->iqTargQ = pid_update(oPidVelocity, oPdo->iqTargV, oPdo->iqVel);
     
 //    HAL_GPIO_WritePin(GPIOC, GPIO_PIN_13, GPIO_PIN_RESET);
 
