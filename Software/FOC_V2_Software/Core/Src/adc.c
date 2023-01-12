@@ -22,6 +22,7 @@
 
 /* USER CODE BEGIN 0 */
 
+
 /* USER CODE END 0 */
 
 ADC_HandleTypeDef hadc1;
@@ -169,10 +170,29 @@ uint16_t ADC_DMA_AVERAGE(int channel)
 	return adc_sum/NUMBER_ADC_CHANNEL_AVERAGE_PER_CHANNEL;
 }
 
-void ADC_get_voltage(void){
+extern sdo_typedef* oConfig;
+extern filter_typedef* oFilterCurrentD;
+extern filter_typedef* oFilterCurrentQ;
 
-//    actualCurA = ADC_DMA_AVERAGE(0);
-//    actualCurB = ADC_DMA_AVERAGE(1);
+void ADC_get_voltage(pdo_typedef *handle){
+    
+    static int actualCurA, actualCurB;
+    _iq I_alpha, I_beta;
+    actualCurA = ADC_DMA_AVERAGE(0) - oConfig->CONST_ADC0_OFFSET;
+    actualCurB = ADC_DMA_AVERAGE(1) - oConfig->CONST_ADC1_OFFSET;
+//    printf("%d, %d\r\n", actualCurA, actualCurB);
+    
+    handle->iqCurA = convert_pulse_to_current(actualCurA);
+    handle->iqCurB = convert_pulse_to_current(actualCurB);
+    
+    I_alpha = handle->iqCurA;
+    I_beta = _IQmpy(_IQ(_1_SQRT3), handle->iqCurA) + _IQmpy(_IQ(_2_SQRT3), handle->iqCurB);
+    handle->iqCurD = _IQmpy(I_alpha, _IQcos(handle->iqPosElec)) + _IQmpy(I_beta, _IQsin(handle->iqPosElec));
+    handle->iqCurQ = _IQmpy(I_beta, _IQcos(handle->iqPosElec)) - _IQmpy(I_alpha, _IQsin(handle->iqPosElec));
+    
+    handle->iqCurD = filter_update(oFilterCurrentD, handle->iqCurD);
+    handle->iqCurQ = filter_update(oFilterCurrentQ, handle->iqCurQ);
+    
     
 }
 /* USER CODE END 1 */

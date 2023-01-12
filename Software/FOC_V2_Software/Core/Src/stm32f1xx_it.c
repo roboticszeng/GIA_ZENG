@@ -26,6 +26,7 @@
 #include "controll.h"
 #include "as5600.h"
 #include "can.h"
+#include "adc.h"
 
 /* USER CODE END Includes */
 
@@ -73,11 +74,18 @@ extern uint8_t Rxdata[8] ;
 extern float rxdata;
 uint8_t can_rx_finish_flag;//接收完成标志位
 
-extern pid_typedef* oPidVelocity;
+
 extern encoder_typedef* oEncoder;
 extern sdo_typedef* oConfig;
 extern pdo_typedef* oPdo;
+
+extern pid_typedef* oPidVelocity;
+extern pid_typedef* oPidCurrentD;
+extern pid_typedef* oPidCurrentQ;
+
 extern filter_typedef* oFilterVelocity;
+extern filter_typedef* oFilterCurrentD;
+extern filter_typedef* oFilterCurrentQ;
 
 /* USER CODE END EV */
 
@@ -289,6 +297,8 @@ void TIM1_UP_IRQHandler(void)
 //    I_beta = _IQmpy(_IQ(_1_SQRT3), Ia) + _IQmpy(_IQ(_2_SQRT3), Ib);
 //    I_d = _IQmpy(I_alpha, _IQcos(_IQ(angle_elec))) + _IQmpy(I_beta, _IQsin(_IQ(angle_elec)));
 //    I_q = _IQmpy(I_beta, _IQcos(_IQ(angle_elec))) - _IQmpy(I_alpha, _IQsin(_IQ(angle_elec)));
+
+    ADC_get_voltage(oPdo);
     
     
 //    HAL_GPIO_WritePin(GPIOC, GPIO_PIN_13, GPIO_PIN_RESET);
@@ -325,31 +335,36 @@ void TIM2_IRQHandler(void)
 /**
   * @brief This function handles TIM3 global interrupt.
   */
+_iq uq, ud;
 void TIM3_IRQHandler(void)
 {
   /* USER CODE BEGIN TIM3_IRQn 0 */
-//    static float a;
     // TIM3 电流环控制 频率 XHZ
+    static _iq t = 0.0;
+//    static _iq target_q;
   /* USER CODE END TIM3_IRQn 0 */
   HAL_TIM_IRQHandler(&htim3);
   /* USER CODE BEGIN TIM3_IRQn 1 */
 //    HAL_GPIO_WritePin(GPIOC, GPIO_PIN_13, GPIO_PIN_SET);
      
     
-//    PIDController_Update(&PID_Current_Q, 0.2, tempb / 24);
-//    setPhaseVoltage(PID_Current_Q.out, 0, angle_elec);
-//    setPhaseVoltage(0.2, 0, angle_elec);
+//    t = t + _IQ(oConfig->CONST_CURRENT_CONTROL_TIME);
+//    oPdo->iqTargQ = _IQsin(_IQmpy(t, _IQmpyI32(_IQ(_2PI), 100)));
     
-//    targetQ = PIDController_Update(&PID_Velocity, 2000, actualVel);
-//    setPhaseVoltage(targetQ, 0, angle_elec);
+    oPdo->iqTargQ = _IQ(1.0);
     
+    uq = pid_update(oPidCurrentQ, oPdo->iqTargQ, oPdo->iqCurQ);
+    ud = pid_update(oPidCurrentD, oPdo->iqTargD, oPdo->iqCurD);
     
-//     a = a + 0.002;
-//     setPhaseVoltage(0.1, 0, a);
+    compute_svpwm(uq, ud, oPdo->iqPosElec);
+    
+//    static float a;
+//    a += 0.02;
+//    compute_svpwm(_IQ(0.2), _IQ(0.0), _IQ(a));
+    
     
 //    HAL_GPIO_WritePin(GPIOC, GPIO_PIN_13, GPIO_PIN_RESET);
     
-//    
 
   /* USER CODE END TIM3_IRQn 1 */
 }
@@ -366,8 +381,10 @@ void TIM4_IRQHandler(void)
   /* USER CODE END TIM4_IRQn 0 */
   HAL_TIM_IRQHandler(&htim4);
   /* USER CODE BEGIN TIM4_IRQn 1 */
-//    targetQ = PIDController_Update(&PID_Velocity, 2000, actualVel);
-//    targetQ = PIDController_Update(&PID_Velocity, 2000, actualVel);
+    
+//    oPdo->iqTargV = _IQ(6.0);
+//    
+//    oPdo->iqTargQ = pid_update(oPidVelocity, oPdo->iqTargV, oPdo->iqVel);
     
 //    HAL_GPIO_WritePin(GPIOC, GPIO_PIN_13, GPIO_PIN_RESET);
 

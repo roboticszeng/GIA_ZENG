@@ -90,11 +90,20 @@ extern uint8_t can_rx_finish_flag;//接收完成标志位
 extern uint16_t adc_dma_buf[NUMBER_ADC_CHANNEL * NUMBER_ADC_CHANNEL_AVERAGE_PER_CHANNEL];
 
 
-pid_typedef* oPidVelocity;
 encoder_typedef* oEncoder;
 sdo_typedef* oConfig;
 pdo_typedef* oPdo;
+
+pid_typedef* oPidVelocity;
+pid_typedef* oPidCurrentD;
+pid_typedef* oPidCurrentQ;
+
 filter_typedef* oFilterVelocity;
+filter_typedef* oFilterCurrentD;
+filter_typedef* oFilterCurrentQ;
+
+extern _iq uq;
+extern _iq ud;
 
 extern float temp[10];
 
@@ -109,7 +118,7 @@ int main(void)
   /* USER CODE BEGIN 1 */
 
     
-    oPidVelocity = pid_new();
+    
 
     oEncoder = as5600_new();
     oEncoder->i2c_handle = &hi2c1;
@@ -119,14 +128,28 @@ int main(void)
     oConfig = config_new();
     oPdo = pdo_new();
     
+    oPidVelocity = pid_new();
+    oPidCurrentD = pid_new();
+    oPidCurrentQ = pid_new();
+    
     oFilterVelocity = filter_new();
+    oFilterCurrentD = filter_new();
+    oFilterCurrentQ = filter_new();
     
     
-    pid_init(oPidVelocity, 1.0, 100.0, 100e-3, 1e6, 1e6);
+    
     as5600_init(oEncoder);
     config_init(oConfig);
     pdo_init(oPdo);
-    filter_init(oFilterVelocity, 100.0, 0.1);
+    
+    pid_init(oPidVelocity, 0.05, 0.8, oConfig->CONST_POSITION_CONTROL_TIME, 2.0, 1.5);
+    pid_init(oPidCurrentQ, 1.0, 200.0, oConfig->CONST_CURRENT_CONTROL_TIME, 0.9, 0.5);
+    pid_init(oPidCurrentD, 0.5, 0.0, oConfig->CONST_CURRENT_CONTROL_TIME, 0.2, 0.1);
+    
+    filter_init(oFilterVelocity, 20.0, oConfig->CONST_POSITION_SAMP_TIME);
+    filter_init(oFilterCurrentD, 100.0, oConfig->CONST_CURRENT_SAMP_TIME);
+    filter_init(oFilterCurrentQ, 100.0, oConfig->CONST_CURRENT_SAMP_TIME);
+    
     
 
     
@@ -166,64 +189,48 @@ int main(void)
     HAL_GPIO_WritePin(DRV_EN_GPIO_Port, DRV_EN_Pin, GPIO_PIN_SET);
     HAL_GPIO_WritePin(GPIOC, GPIO_PIN_13, GPIO_PIN_RESET);
     HAL_GPIO_WritePin(SENS_DIR_GPIO_Port, SENS_DIR_Pin, GPIO_PIN_RESET);
-//    AS5600_init(encoder);
     
     
     HAL_ADC_Start_DMA(&hadc1, (uint32_t *)adc_dma_buf, NUMBER_ADC_CHANNEL * NUMBER_ADC_CHANNEL_AVERAGE_PER_CHANNEL);
+
+    HAL_TIM_PWM_Start(&htim1,TIM_CHANNEL_1);
+    HAL_TIM_PWM_Start(&htim1,TIM_CHANNEL_2);
+    HAL_TIM_PWM_Start(&htim1,TIM_CHANNEL_3);
+    
+    for(int i = 0; i < 5; i++){
+        compute_svpwm(_IQ(0.5), _IQ(0.0), _IQ(0.0));
+        HAL_Delay(10);
+    }
+
+    HAL_Delay(1000);
 
     HAL_TIM_Base_Start_IT(&htim1);
     HAL_TIM_Base_Start_IT(&htim2);
     HAL_TIM_Base_Start_IT(&htim3);
     HAL_TIM_Base_Start_IT(&htim4);
     
-    HAL_TIM_PWM_Start(&htim1,TIM_CHANNEL_1);
-    HAL_TIM_PWM_Start(&htim1,TIM_CHANNEL_2);
-    HAL_TIM_PWM_Start(&htim1,TIM_CHANNEL_3);
-    
-    
-//    for(int i = 0; i < 500; i++){
-//        setPhaseVoltage(0.5, 0.0, 0.0);
-//        HAL_Delay(10);
-//    }
-    
-    
-    
     CAN_User_Init(&hcan);
     
-    HAL_Delay(2000);
-    
-    
-    int a = __HAL_TIM_GET_AUTORELOAD(&htim1);
-    int b = __HAL_TIM_GET_COMPARE(&htim1, TIM_CHANNEL_1);
-    _iq c = _IQ(0.0);
-    uint16_t p_raw, p;
-    _iq pid_res = _IQ(0.0);
-    _iq angle_filt;
   /* USER CODE END 2 */
 
   /* Infinite loop */
   /* USER CODE BEGIN WHILE */
   while (1)
   {
+//      printf("%.4f, %4f, %4f, %.4f, %.4f\r\n", _IQtoF(oPdo->iqCurQ), _IQ15toF(oPidCurrentQ->prevError), \
+//        _IQ15toF(oPidCurrentQ->proportional), _IQ15toF(oPidCurrentQ->integrator), _IQtoF(uq));
       
-//      as5600_get_angle(oEncoder, oPdo);
-      compute_following_error(oPdo);
+//      printf("%.4f, %4f, %4f, %.4f, %.4f\r\n", _IQtoF(oPdo->iqCurD), _IQ15toF(oPidCurrentD->prevError), \
+//        _IQ15toF(oPidCurrentD->proportional), _IQ15toF(oPidCurrentD->integrator), _IQtoF(ud));
+      
+      printf("%d, %.4f, %4f, %4f, %.4f, %.4f\r\n", oPdo->actual_velocity, _IQtoF(oPdo->iqVel), _IQ15toF(oPidVelocity->prevError), \
+        _IQ15toF(oPidVelocity->proportional), _IQ15toF(oPidVelocity->integrator), _IQtoF(oPdo->iqTargQ));
 
+//      printf("%.4f, %.4f, %f\r\n", _IQtoF(oPdo->iqCurQ), _IQtoF(oPdo->iqTargQ), _IQtoF(oPdo->iqTargQ - oPdo->iqCurQ));
       
-      printf("%.3f, ", _IQtoF(oPdo->iqPos));
-      printf("%.3f, ", _IQtoF(oPdo->iqVel));
-      printf("%d, %d, ", oPdo->target_position, oPdo->actual_position_prev);
-      printf("%d, %d", oPdo->actual_velocity, oPdo->following_error);
-      printf("\r\n");
-      
-      HAL_GPIO_WritePin(GPIOC, GPIO_PIN_13, GPIO_PIN_SET);
-      
-      can_send_pdo();
-      
-      HAL_GPIO_WritePin(GPIOC, GPIO_PIN_13, GPIO_PIN_RESET);
-      
-      
-      
+//      printf("%.4f, %.4f, %.4f\r\n", _IQtoF(oPdo->iqVel), _IQtoF(oPdo->iqCurQ), _IQtoF(oPdo->iqTargQ));
+
+      HAL_GPIO_TogglePin(GPIOC, GPIO_PIN_13);
       HAL_Delay(100);
     /* USER CODE END WHILE */
 

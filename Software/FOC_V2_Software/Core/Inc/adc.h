@@ -30,6 +30,8 @@ extern "C" {
 
 /* USER CODE BEGIN Includes */
 
+#include "controll.h"
+    
 /* USER CODE END Includes */
 
 extern ADC_HandleTypeDef hadc1;
@@ -46,10 +48,9 @@ void MX_ADC1_Init(void);
 /* USER CODE BEGIN Prototypes */
 
 void ADC_Select_Channel(uint32_t ch);
-void ADC_get_voltage(void);
 uint16_t ADC_DMA_AVERAGE(int channel);
 
-
+void ADC_get_voltage(pdo_typedef *handle);
     
 /* USER CODE END Prototypes */
 

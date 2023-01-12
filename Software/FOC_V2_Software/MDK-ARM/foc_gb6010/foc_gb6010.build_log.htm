@@ -26,14 +26,16 @@ Project File Date:  01/10/2023
 
 <h2>Output:</h2>
 Build target 'foc_gb6010'
-compiling main.c...
-../Core/Inc/AS5600.h(136): warning:  #1-D: last line of file ends without a newline
+compiling stm32f1xx_it.c...
+../Core/Inc/as5600.h(136): warning:  #1-D: last line of file ends without a newline
   #endif        /* AS5600_INCLUDED */
-../Core/Src/main.c: 1 warning, 0 errors
+../Core/Src/stm32f1xx_it.c(343): warning:  #177-D: variable "t" was declared but never referenced
+      static _iq t = 0.0;
+../Core/Src/stm32f1xx_it.c: 2 warnings, 0 errors
 linking...
-Program Size: Code=25320 RO-data=292 RW-data=148 ZI-data=2196  
+Program Size: Code=25264 RO-data=292 RW-data=148 ZI-data=2196  
 FromELF: creating hex file...
-"foc_gb6010\foc_gb6010.axf" - 0 Error(s), 1 Warning(s).
+"foc_gb6010\foc_gb6010.axf" - 0 Error(s), 2 Warning(s).
 
 <h2>Software Packages used:</h2>
 

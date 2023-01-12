@@ -18,30 +18,36 @@ void pid_init(pid_typedef *handle, float Kp, float Ki, float T, float Max, float
 	/* Clear controller variables */
     // 暂时不用Kd
     
-    handle->Kp = _IQ(Kp);
-    handle->Ki = _IQ(Ki);
+    handle->Kp = _IQ15(Kp);
+    handle->Ki = _IQ15(Ki);
     handle->T = _IQ(T);
-    handle->limMax = _IQ(Max);
-    handle->limMin = -_IQ(Max);
-    handle->limMaxInt = _IQ(MaxInt);
-    handle->limMinInt = -_IQ(MaxInt);
+    handle->limMax = _IQ15(Max);
+    handle->limMin = -_IQ15(Max);
+    handle->limMaxInt = _IQ15(MaxInt);
+    handle->limMinInt = -_IQ15(MaxInt);
     
-    handle->Kd = _IQ(0.0);
-    handle->tau = _IQ(0.0);
-	handle->integrator = _IQ(0.0);
-	handle->prevError  = _IQ(0.0);
-	handle->differentiator  = _IQ(0.0);
-	handle->prevMeasurement = _IQ(0.0);
-	handle->out = _IQ(0.0);
+    handle->Kd = _IQ15(0.0);
+    handle->tau = _IQ15(0.0);
+	handle->integrator = _IQ15(0.0);
+	handle->prevError  = _IQ15(0.0);
+	handle->differentiator  = _IQ15(0.0);
+	handle->prevMeasurement = _IQ15(0.0);
+	handle->out = _IQ15(0.0);
 
 }
 
 _iq pid_update(pid_typedef *pid, _iq setpoint, _iq measurement) {
 
-    static _iq error;
-    error = setpoint - measurement;
-    pid->proportional = _IQmpy(pid->Kp, error);
-    pid->integrator = pid->integrator + _IQmpy(_IQmpy(_IQmpy(_IQ(0.5), pid->Ki), pid->T), (error + pid->prevError));
+    static _iq15 error;
+    error = _IQtoIQ15(setpoint) - _IQtoIQ15(measurement);
+    
+//    printf("%f\r\n", _IQ15toF(error));
+    
+    pid->proportional = _IQ15mpy(pid->Kp, error);
+    
+    pid->integrator = pid->integrator + _IQ15mpyIQX(_IQmpy(_IQmpy(_IQ(0.5), _IQ15toIQ(pid->Ki)), pid->T), 20, (error + pid->prevError), 15);
+//    pid->integrator = _IQ15mpyIQX(_IQmpy(_IQmpy(_IQ(0.5), _IQ15toIQ(pid->Ki)), pid->T), 20, (error + pid->prevError), 15);
+    
     if (pid->integrator > pid->limMaxInt) {
         pid->integrator = pid->limMaxInt;
     } else if (pid->integrator < pid->limMinInt) {
@@ -51,7 +57,7 @@ _iq pid_update(pid_typedef *pid, _iq setpoint, _iq measurement) {
 //                        + (2.0f * pid->tau - pid->T) * pid->differentiator)
 //                        / (2.0f * pid->tau + pid->T);
     // 暂时不用KD
-    pid->differentiator = _IQ(0.0);
+    pid->differentiator = _IQ15(0.0);
     pid->out = pid->proportional + pid->integrator + pid->differentiator;
     if (pid->out > pid->limMax) {
         pid->out = pid->limMax;
@@ -59,8 +65,8 @@ _iq pid_update(pid_typedef *pid, _iq setpoint, _iq measurement) {
         pid->out = pid->limMin;
     }
     pid->prevError       = error;
-    pid->prevMeasurement = measurement;
-    return pid->out;
+    pid->prevMeasurement = _IQtoIQ15(measurement);
+    return _IQ15toIQ(pid->out);
 }
 
 /*** PID ***/
@@ -77,11 +83,13 @@ filter_typedef* filter_new(void){
 }
 
 
-void filter_init(filter_typedef* handle, float freq, float sample_time){
+void filter_init(filter_typedef* handle, float cutoff_freq, float sample_time){
     
-    float rc = 1.0 / (_2PI * freq);
+    float rc = 1.0 / (_2PI * cutoff_freq);
     handle->k[0] = _IQ(sample_time / (sample_time + rc));
     handle->k[1] = _IQ(rc / (sample_time + rc));
+//    handle->k[0] = _IQ(0.1);
+//    handle->k[1] = _IQ(0.9);
     
     handle->output[0] = _IQ(0.0);
     handle->output[1] = _IQ(0.0);
@@ -114,26 +122,43 @@ sdo_typedef* config_new(void) {
 }
 
 void config_init(sdo_typedef *handle){
-    handle->CONST_PWM_PERIOD = _IQ(__HAL_TIM_GET_AUTORELOAD(&htim1) + 1);
+    
+//    handle->CONST_PWM_PERIOD = _IQ(__HAL_TIM_GET_AUTORELOAD(&htim1) + 1);
+    handle->CONST_PWM_PERIOD = _IQ(1500);
     // check 怎么get prescaler?
     handle->CONST_POSITION_SAMP_TIME = _IQ(1e-3);
-    handle->CONST_ENC_RESOLUTION = _IQ(4096);
-    handle->CONST_POLAR_PAIRS = _IQ(14);
-    handle->CONST_ZERO_POSITION = _IQ(0);
     
-    handle->CONST_ADC_RESOLUTION = _IQ(4096);
+    handle->CONST_POLAR_PAIRS = _IQ(14);
+    
+    handle->CONST_ZERO_POSITION = _IQ15(0);
+    handle->CONST_ENC_RESOLUTION = _IQ15(4096);
+    handle->CONST_ADC_RESOLUTION = _IQ15(4096);
+    
     handle->CONST_MCU_VOLTAGE = _IQ(3.3);
     handle->CONST_CUR_SAMP_GAIN = _IQ(50);
     handle->CONST_CUR_SAMP_RESISTANCE = _IQ(0.01);
     
-    handle->CONST_PULSE_TO_CUR_SLOPE = _IQdiv(handle->CONST_MCU_VOLTAGE, \
-        _IQmpy(_IQmpy(handle->CONST_CUR_SAMP_GAIN, handle->CONST_CUR_SAMP_RESISTANCE), handle->CONST_ADC_RESOLUTION));
-    handle->CONST_PULSE_TO_CUR_OFFSET = _IQdiv(-handle->CONST_MCU_VOLTAGE, \
-        _IQmpy(_IQmpy(handle->CONST_CUR_SAMP_GAIN, handle->CONST_CUR_SAMP_RESISTANCE), _IQ(2.0)));
+    handle->CONST_ADC0_OFFSET = -63;
+    handle->CONST_ADC1_OFFSET = -63;
     
+    handle->CONST_CURRENT_SAMP_TIME = _IQ(62.5e-6);
+    
+//    handle->CONST_PULSE_TO_CUR_SLOPE = _IQdiv(handle->CONST_MCU_VOLTAGE, \
+//        _IQ15mpyIQX(_IQmpy(handle->CONST_CUR_SAMP_GAIN, handle->CONST_CUR_SAMP_RESISTANCE), 20, handle->CONST_ADC_RESOLUTION, 15));
+    handle->CONST_PULSE_TO_CUR_SLOPE = _IQ(0.001611328);
+
+    handle->CONST_PULSE_TO_CUR_OFFSET = -_IQdiv(handle->CONST_MCU_VOLTAGE, \
+        _IQmpy(_IQmpy(handle->CONST_CUR_SAMP_GAIN, handle->CONST_CUR_SAMP_RESISTANCE), _IQ(2.0)));
+
+//    handle->CONST_PULSE_TO_CUR_SLOPE = _IQ5(0.001611328);
+//    handle->CONST_PULSE_TO_CUR_OFFSET = _IQ(-3.3);
+
     handle->CONST_CUR_TO_PULSE_SLOPE = _IQdiv(_IQmpy(_IQmpy(handle->CONST_CUR_SAMP_GAIN, handle->CONST_CUR_SAMP_RESISTANCE), handle->CONST_ADC_RESOLUTION), \
         handle->CONST_MCU_VOLTAGE);
-    handle->CONST_CUR_TO_PULSE_OFFSET = _IQdiv(handle->CONST_ADC_RESOLUTION, _IQ(2));
+    handle->CONST_CUR_TO_PULSE_OFFSET = _IQdiv(handle->CONST_ADC_RESOLUTION, _IQ(2.0));
+    
+    handle->CONST_CURRENT_CONTROL_TIME = 160e-6;
+    handle->CONST_POSITION_CONTROL_TIME = 320e-6;
     
 }
 
@@ -148,6 +173,9 @@ void pdo_init(pdo_typedef *handle){
     handle->target_position = 0;
     handle->target_velocity = BIT_15;
     handle->target_current_q = BIT_15;
+    
+    handle->iqTargQ = _IQ(0.0);
+    handle->iqTargD = _IQ(0.0);
     
 }
 
@@ -239,9 +267,11 @@ void compute_svpwm(_iq Uq, _iq Ud, _iq angle_elec)
     Pa = _IQint(_IQmpy(Ta, oConfig->CONST_PWM_PERIOD));
     Pb = _IQint(_IQmpy(Tb, oConfig->CONST_PWM_PERIOD));
     Pc = _IQint(_IQmpy(Tc, oConfig->CONST_PWM_PERIOD));
-	__HAL_TIM_SET_COMPARE(&htim1,TIM_CHANNEL_1, Pa);      //输出PWM的函数
-	__HAL_TIM_SET_COMPARE(&htim1,TIM_CHANNEL_2, Pb);
-	__HAL_TIM_SET_COMPARE(&htim1,TIM_CHANNEL_3, Pc);
+    
+    
+    __HAL_TIM_SET_COMPARE(&htim1,TIM_CHANNEL_1, Pa);
+    __HAL_TIM_SET_COMPARE(&htim1,TIM_CHANNEL_2, Pb);
+    __HAL_TIM_SET_COMPARE(&htim1,TIM_CHANNEL_3, Pc);
 
 }
 
@@ -276,22 +306,30 @@ _iq compute_position_elec(_iq pos){
 }
 
 _iq convert_pulse_to_position(uint16_t actual_position){
-    return _IQdiv(_IQmpy(_IQ(actual_position) - oConfig->CONST_ZERO_POSITION, _IQ(_2PI)), oConfig->CONST_ENC_RESOLUTION);
+    
+//    return _IQmpyIQX(_IQ15div(_IQ15(actual_position) - oConfig->CONST_ZERO_POSITION, oConfig->CONST_ENC_RESOLUTION), 15, _IQ(_2PI), 20);
+    return _IQ15toIQ(_IQ15div(_IQ15mpy(_IQ15(actual_position) - oConfig->CONST_ZERO_POSITION, _IQ15(_2PI)), oConfig->CONST_ENC_RESOLUTION));
 }
 
-_iq convert_pulse_to_velocity(uint16_t actual_velocity){
-    return _IQdiv(_IQmpy(_IQ(actual_velocity - BIT_15), _IQ(_2PI)), oConfig->CONST_ENC_RESOLUTION);
+_iq convert_pulse_to_velocity(uint32_t actual_velocity){
+    
+    
+    return _IQ((float)(actual_velocity - BIT_15)  / 4096.0 * _2PI);
+    
+//    return _IQ15toIQ(_IQ15div(_IQ15mpyIQX(_IQ15(actual_velocity - BIT_15), 15, _IQ(_2PI), 20), oConfig->CONST_ENC_RESOLUTION));
+    
 }
 
 _iq convert_pulse_to_current(uint16_t actual_current){
-    return _IQmpy(_IQ(actual_current), oConfig->CONST_PULSE_TO_CUR_SLOPE) + oConfig->CONST_PULSE_TO_CUR_OFFSET;
+    return _IQmpyI32(oConfig->CONST_PULSE_TO_CUR_SLOPE, actual_current) + oConfig->CONST_PULSE_TO_CUR_OFFSET;
+//    return _IQ(actual_current * 0.001611328 - 3.3);
 }
 
 uint16_t convert_position_to_pulse(_iq pos){
     return _IQint(_IQdiv(_IQmpy(oConfig->CONST_ENC_RESOLUTION, pos), _IQ(_2PI)) + oConfig->CONST_ZERO_POSITION);
 }
     
-uint16_t convert_velocity_to_pulse(_iq vel){
+uint32_t convert_velocity_to_pulse(_iq vel){
     return _IQint(_IQdiv(_IQmpy(oConfig->CONST_ENC_RESOLUTION, vel), _IQ(_2PI)) + _IQ(BIT_15));
 }
 

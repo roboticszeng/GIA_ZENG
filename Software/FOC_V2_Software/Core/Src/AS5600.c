@@ -228,8 +228,14 @@ HAL_StatusTypeDef as5600_get_angle(encoder_typedef* const enc_handle, pdo_typede
     pdo_handle->iqPosElec = compute_position_elec(pdo_handle->iqPos);
 //    pdo_handle->iqVel = _IQdiv((pdo_handle->iqPos - pdo_handle->iqPosPrev), oConfig->CONST_POSITION_SAMP_TIME);
     
-    pdo_handle->actual_velocity = _IQint(_IQdiv(_IQ(pdo_handle->actual_position - pdo_handle->actual_position_prev), \
-        oConfig->CONST_POSITION_SAMP_TIME)) + BIT_15;
+//    pdo_handle->actual_velocity = _IQint(_IQdiv(_IQ(pdo_handle->actual_position - pdo_handle->actual_position_prev), \
+//        oConfig->CONST_POSITION_SAMP_TIME)) + BIT_15;
+    
+//    pdo_handle->actual_velocity = (pdo_handle->actual_position - pdo_handle->actual_position_prev) * \
+//        _IQint(_IQdiv(_IQ(1.0), oConfig->CONST_POSITION_SAMP_TIME)) + BIT_15;
+    
+    pdo_handle->actual_velocity = (pdo_handle->actual_position - pdo_handle->actual_position_prev) * 1000 + BIT_15;
+    
     pdo_handle->iqVel = convert_pulse_to_velocity(pdo_handle->actual_velocity);
     
     pdo_handle->iqVel = filter_update(oFilterVelocity, pdo_handle->iqVel);

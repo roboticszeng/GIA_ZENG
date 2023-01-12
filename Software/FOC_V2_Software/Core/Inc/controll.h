@@ -31,33 +31,33 @@ extern "C" {
 // typedef
 typedef struct {
 	/* Controller gains */
-	_iq Kp;
-	_iq Ki;
-	_iq Kd;
+	_iq15 Kp;
+	_iq15 Ki;
+	_iq15 Kd;
 
 	/* Derivative low-pass filter time constant */
-	_iq tau;
+	_iq15 tau;
 
 	/* Output limits */
-	_iq limMin;
-	_iq limMax;
+	_iq15 limMin;
+	_iq15 limMax;
 	
 	/* Integrator limits */
-	_iq limMinInt;
-	_iq limMaxInt;
+	_iq15 limMinInt;
+	_iq15 limMaxInt;
 
 	/* Sample time (in seconds) */
 	_iq T;
 
 	/* Controller "memory" */
-    _iq proportional;
-	_iq integrator;
-	_iq prevError;			/* Required for integrator */
-	_iq differentiator;
-	_iq prevMeasurement;		/* Required for differentiator */
+    _iq15 proportional;
+	_iq15 integrator;
+	_iq15 prevError;			/* Required for integrator */
+	_iq15 differentiator;
+	_iq15 prevMeasurement;		/* Required for differentiator */
 
 	/* Controller output */
-	_iq out;
+	_iq15 out;
 
 } pid_typedef;
 
@@ -70,23 +70,45 @@ typedef struct{
 
 typedef struct{
     
-    // 常数
+    // PWM自动重装值
     _iq CONST_PWM_PERIOD;
-    _iq CONST_ENC_RESOLUTION;
+
+    // 极对数
     _iq CONST_POLAR_PAIRS;
-    _iq CONST_ZERO_POSITION;
+    // 运动学零位的编码器值
+    _iq15 CONST_ZERO_POSITION;
+    // ADC位数
+    _iq15 CONST_ADC_RESOLUTION;
+    // 编码器线数
+    _iq15 CONST_ENC_RESOLUTION;
     
-    _iq CONST_ADC_RESOLUTION;
+    // ADC0偏置值，静态电流的ADC采样值比2048大时，这一值为正
+    int CONST_ADC0_OFFSET;
+    // ADC1偏置值
+    int CONST_ADC1_OFFSET;
+    // MCU供电电压
     _iq CONST_MCU_VOLTAGE;
+    // 采样电阻增益
     _iq CONST_CUR_SAMP_GAIN;
+    // 采样电阻阻值
     _iq CONST_CUR_SAMP_RESISTANCE;
     
+    // 电流脉冲和安培互换的系数
     _iq CONST_PULSE_TO_CUR_SLOPE;
+//    _iq5 CONST_PULSE_TO_CUR_SLOPE;
     _iq CONST_PULSE_TO_CUR_OFFSET;
     _iq CONST_CUR_TO_PULSE_SLOPE;
     _iq CONST_CUR_TO_PULSE_OFFSET;
     
-    _iq CONST_POSITION_SAMP_TIME;
+    // 编码器采样时间
+    float CONST_POSITION_SAMP_TIME;
+    // 电流采样时间
+    float CONST_CURRENT_SAMP_TIME;
+    
+    // 电流环控制时间
+    float CONST_CURRENT_CONTROL_TIME;
+    // 位置速度环控制时间
+    float CONST_POSITION_CONTROL_TIME;
     
     
 } sdo_typedef;
@@ -103,23 +125,23 @@ typedef struct{
     
     _iq iqPosPrev;
     
-    
-    
-    
-    
-    
+    _iq iqTargQ;
+    _iq iqTargD;
+    _iq iqTargV;
+    _iq iqTargP;
     
     
     uint16_t actual_position;
-    uint16_t actual_velocity;
+    uint32_t actual_velocity;
     uint16_t actual_current_q;
     uint16_t actual_current_d;
     uint16_t following_error;
     uint16_t mode;
     
     uint16_t target_position;
-    uint16_t target_velocity;
+    uint32_t target_velocity;
     uint16_t target_current_q;
+    uint16_t target_current_d;
     
     uint16_t actual_position_prev;
     
@@ -148,11 +170,11 @@ _iq compute_position_elec(_iq pos);
 
 // 单位转换
 _iq convert_pulse_to_position(uint16_t actual_position);
-_iq convert_pulse_to_velocity(uint16_t actual_velocity);
+_iq convert_pulse_to_velocity(uint32_t actual_velocity);
 _iq convert_pulse_to_current(uint16_t actual_current);
 
 uint16_t convert_position_to_pulse(_iq pos);
-uint16_t convert_velocity_to_pulse(_iq vel);
+uint32_t convert_velocity_to_pulse(_iq vel);
 uint16_t convert_current_to_pulse(_iq cur);
 
 
