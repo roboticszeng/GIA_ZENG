@@ -1,11 +1,11 @@
 clear;clc;
 
-pid.pos.kp = 20.8;
+pid.pos.kp = 20;
 pid.pos.ki = 0;
 pid.pos.max = 15;
 pid.pos.intmax = 15;
-pid.vel.kp = 0.2;
-pid.vel.ki = 1.5;
+pid.vel.kp = 0.1;
+pid.vel.ki = 2.0;
 pid.vel.max = 2;
 pid.vel.intmax = 1.5;
 pid.curq.kp = 0.8;
@@ -75,13 +75,8 @@ end
 
 time = cell(length(f), 1);
 for i = 1 : length(f)
-    if i < 10
-        time{i} = ['12:08:0' num2str(i)];
-    elseif i >= 60
-        disp('err');
-    else
         time{i} = ['12:08:' num2str(i)];
-    end
+%     end
 end
 
 addr = {'0x3000', '0x3500', '0x3502', ...
@@ -104,3 +99,34 @@ for i = 1 : length(addr)
 end
 fclose(fileID);
 
+% kp_int_write = dec2hex(sdo.pid_vel_kp_int)
+% kp_dec_write = dec2hex(sdo.pid_vel_kp_dec)
+% ki_int_write = dec2hex(sdo.pid_vel_ki_int)
+% ki_dec_write = dec2hex(sdo.pid_vel_ki_dec)
+
+outputfilename = 'pid_pos.csv';
+fileID = fopen(outputfilename, 'w');
+fprintf(fileID, '序号,系统时间,时间标识,CAN通道,传输方向,ID号,帧类型,帧格式,长度,数据\r\n');
+for i = 1 : 4
+    fprintf(fileID, '%d,%s,无,ch1,发送,%s,数据帧,扩展帧,0x08,%s\r\n', ...
+        (i-1), time{i}, addr{i + 3}, std_data{i + 3});
+end
+fclose(fileID);
+
+outputfilename = 'pid_vel.csv';
+fileID = fopen(outputfilename, 'w');
+fprintf(fileID, '序号,系统时间,时间标识,CAN通道,传输方向,ID号,帧类型,帧格式,长度,数据\r\n');
+for i = 1 : 4
+    fprintf(fileID, '%d,%s,无,ch1,发送,%s,数据帧,扩展帧,0x08,%s\r\n', ...
+        (i-1), time{i}, addr{i + 9}, std_data{i + 9});
+end
+fclose(fileID);
+
+outputfilename = 'pid_cur.csv';
+fileID = fopen(outputfilename, 'w');
+fprintf(fileID, '序号,系统时间,时间标识,CAN通道,传输方向,ID号,帧类型,帧格式,长度,数据\r\n');
+for i = 1 : 8
+    fprintf(fileID, '%d,%s,无,ch1,发送,%s,数据帧,扩展帧,0x08,%s\r\n', ...
+        (i-1), time{i}, addr{i + 15}, std_data{i + 15});
+end
+fclose(fileID);
