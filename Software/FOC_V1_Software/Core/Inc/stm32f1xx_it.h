@@ -28,6 +28,8 @@
 /* Private includes ----------------------------------------------------------*/
 /* USER CODE BEGIN Includes */
 
+#include <main.h>
+     
 /* USER CODE END Includes */
 
 /* Exported types ------------------------------------------------------------*/
@@ -37,7 +39,7 @@
 
 /* Exported constants --------------------------------------------------------*/
 /* USER CODE BEGIN EC */
-
+     
 /* USER CODE END EC */
 
 /* Exported macro ------------------------------------------------------------*/
@@ -55,6 +57,11 @@ void SVC_Handler(void);
 void DebugMon_Handler(void);
 void PendSV_Handler(void);
 void SysTick_Handler(void);
+void DMA1_Channel1_IRQHandler(void);
+void USB_HP_CAN1_TX_IRQHandler(void);
+void USB_LP_CAN1_RX0_IRQHandler(void);
+void EXTI9_5_IRQHandler(void);
+void TIM1_UP_IRQHandler(void);
 void TIM2_IRQHandler(void);
 void TIM3_IRQHandler(void);
 void TIM4_IRQHandler(void);

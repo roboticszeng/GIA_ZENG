@@ -3,8 +3,8 @@
  * Auto generated Run-Time-Environment Component Configuration File
  *      *** Do not modify ! ***
  *
- * Project: 'FOC_V1_Software' 
- * Target:  'FOC_V1_Software' 
+ * Project: 'foc_gb6010' 
+ * Target:  'foc_gb6010' 
  */
 
 #ifndef RTE_COMPONENTS_H
