@@ -22,7 +22,7 @@
 
 /* USER CODE BEGIN 0 */
 #include "main.h"
-#include "as5600.h"
+#include "AS5600.h"
 #include "controll.h"
 extern CAN_TxHeaderTypeDef Can_Tx;
 extern uint8_t Txdata[8];

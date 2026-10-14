@@ -24,7 +24,7 @@
 /* USER CODE BEGIN Includes */
 
 #include "controll.h"
-#include "as5600.h"
+#include "AS5600.h"
 #include "can.h"
 #include "adc.h"
 #include "flash.h"

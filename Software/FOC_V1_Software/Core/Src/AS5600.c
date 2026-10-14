@@ -1,5 +1,5 @@
 /// includes
-#include "as5600.h"
+#include "AS5600.h"
 #include "i2c.h"
 #include "gpio.h"
 
