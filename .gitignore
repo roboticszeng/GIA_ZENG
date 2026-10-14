@@ -8,5 +8,6 @@
 *.map
 *.o
 *.sct
+build/
 
 
